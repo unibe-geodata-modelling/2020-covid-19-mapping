@@ -1,4 +1,4 @@
-#Exercise 1 and 2 (Homework)
+#Exercise 1 and 2 (Homework.)
 name = input("Dear user, what is your name? ")
 age = int(input ("Dear user, what is your age? "))
 nextage = 0
