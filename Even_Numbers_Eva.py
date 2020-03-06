@@ -9,6 +9,7 @@ def count_even(vals):
         if (v % 2) == 0:
             # counting variable
             c = c + 1
+    # tell the function what you want to have returned from the LOOP
     return c
 
 
