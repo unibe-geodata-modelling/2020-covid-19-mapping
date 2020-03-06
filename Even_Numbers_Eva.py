@@ -12,7 +12,7 @@ def count_even(vals):
     return c
 #list
 x = [-2, -4, 3, 6, 88, 76, -7]
-#only
+#only call the function now! It was defined before
 y=count_even(x)
 
 print("The list {} contains {} even numbers.".format(x,y))
