@@ -1,11 +1,15 @@
 #Corona-Virus Pandas
 #Downloading the CSV-Data
 
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import urllib.request
+
+#Inputdata aus Internet
+inputdata = urllib.request.urlopen("http://cowid.netlify.com/data/full_data.csv")
 #Slash vor USER ist wichtig!!
-inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/full_data.csv"
+#inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/full_data.csv"
 #What exactly is df?
 df=pd.read_csv(inputdata, sep=",")
 #What is this for?
@@ -128,4 +132,5 @@ plt.ylabel("no. of cases per million inhabitants")
 plt. xlabel("days after 100th case")
 plt.xticks(np.arange(0,31,5))
 plt.tight_layout()
+
 plt.show()
