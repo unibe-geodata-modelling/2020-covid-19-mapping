@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import urllib.request
 
-dateoftoday= "16.03.2020"
+dateoftoday= input("What is today's date? ")
 
 #Inputdata aus Internet
 inputdata = urllib.request.urlopen("http://cowid.netlify.com/data/full_data.csv")
