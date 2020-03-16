@@ -108,7 +108,7 @@ plt.legend(loc="best",frameon=False)
 plt.ylabel("no. of cases")
 #Ich hätte gerne, dass die Achse immer ganze Zahlen anzeigt!
 plt. xlabel("days after 100th case")
-
+plt.xticks(np.arange(0,31,5))
 
 
 #plot the data per million inhabitants
@@ -126,6 +126,6 @@ plt.legend(loc="best",frameon=False)
 plt.ylabel("no. of cases per million inhabitants")
 #Ich hätte gerne, dass die Achse immer ganze Zahlen anzeigt!
 plt. xlabel("days after 100th case")
-
+plt.xticks(np.arange(0,31,5))
 plt.tight_layout()
 plt.show()
