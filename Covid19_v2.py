@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 import urllib.request
 
+dateoftoday= "16.03.2020"
+
 #Inputdata aus Internet
 inputdata = urllib.request.urlopen("http://cowid.netlify.com/data/full_data.csv")
 #Slash vor USER ist wichtig!!
@@ -108,6 +110,7 @@ plt.plot(df_JP.countJP, df_JP.total_cases, label="JP", color="grey")
 plt.plot(df_CH.countCH, df_CH.total_cases, label="CH", color="red")
 plt.plot(df_US.countUS, df_US.total_cases, label="US", color="purple")
 #plt.plot(df_CI.countCI, df_CI.total_cases, label="CI", color="pink")
+
 plt.legend(loc="best",frameon=False)
 plt.ylabel("no. of cases")
 #Ich hätte gerne, dass die Achse immer ganze Zahlen anzeigt!
@@ -125,12 +128,14 @@ plt.plot(df_JP.countJP, df_JP.total_cases/popJP*1000000, label="JP", color="grey
 plt.plot(df_CH.countCH, df_CH.total_cases/popCH*1000000, label="CH", color="red")
 plt.plot(df_US.countUS, df_US.total_cases/popUS*1000000, label="US", color="purple")
 #plt.plot(df_CI.countCI, df_CI.total_cases/popCI*1000000, label="CI", color="pink")
-plt.legend(loc="best",frameon=False)
 
+plt.legend(loc="best",frameon=False)
 plt.ylabel("no. of cases per million inhabitants")
-#Ich hätte gerne, dass die Achse immer ganze Zahlen anzeigt!
 plt. xlabel("days after 100th case")
 plt.xticks(np.arange(0,31,5))
-plt.tight_layout()
 
+plt.tight_layout()
+plt.suptitle("Data was retrieved on {}.".format(dateoftoday))
 plt.show()
+
+#Still to do: Nicer showing of the graph and automated date creation! Otherwise very nice :D
