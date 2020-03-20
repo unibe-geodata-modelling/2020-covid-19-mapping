@@ -30,6 +30,7 @@ popAU=8822000
 popJP=126200000
 popUS=327350000
 popCI=1400000000
+popUK=66400000
 
 #Extract the country Dataframes
 df_IT=df[df.location=="Italy"]
@@ -40,6 +41,7 @@ df_CH=df[df.location=="Switzerland"]
 df_JP=df[df.location=="Japan"]
 df_CI=df[df.location=="China"]
 df_US=df[df.location=="United States"]
+df_UK=df[df.location=="United Kingdom"]
 #IT add day counting from case no.100 -> I want the day where case no 100 appeared to be day 0
 
 df_IT["countIT"]=0
@@ -55,6 +57,13 @@ for index, row in df_US.iterrows():
     if row["total_cases"]>=100:
         daycounter+=1
         df_US._set_value(index, "countUS", daycounter)
+
+df_UK["countUK"]=0
+daycounter=0
+for index, row in df_UK.iterrows():
+    if row["total_cases"]>=100:
+        daycounter+=1
+        df_UK._set_value(index, "countUK", daycounter)
 
 df_CI["countCI"]=0
 daycounter=0
@@ -109,6 +118,7 @@ plt.plot(df_AU.countAU, df_AU.total_cases, label="AU", color="black")
 plt.plot(df_JP.countJP, df_JP.total_cases, label="JP", color="grey")
 plt.plot(df_CH.countCH, df_CH.total_cases, label="CH", color="red")
 plt.plot(df_US.countUS, df_US.total_cases, label="US", color="purple")
+plt.plot(df_UK.countUK, df_UK.total_cases, label="UK", color="orange")
 #plt.plot(df_CI.countCI, df_CI.total_cases, label="CI", color="pink")
 
 plt.legend(loc="best",frameon=False)
@@ -127,6 +137,7 @@ plt.plot(df_AU.countAU, df_AU.total_cases/popAU*1000000, label="AU", color="blac
 plt.plot(df_JP.countJP, df_JP.total_cases/popJP*1000000, label="JP", color="grey")
 plt.plot(df_CH.countCH, df_CH.total_cases/popCH*1000000, label="CH", color="red")
 plt.plot(df_US.countUS, df_US.total_cases/popUS*1000000, label="US", color="purple")
+plt.plot(df_UK.countUK, df_UK.total_cases/popUK*1000000, label="UK", color="orange")
 #plt.plot(df_CI.countCI, df_CI.total_cases/popCI*1000000, label="CI", color="pink")
 
 plt.legend(loc="best",frameon=False)
@@ -138,4 +149,4 @@ plt.tight_layout()
 plt.suptitle("Data was retrieved on {}.".format(dateoftoday))
 plt.show()
 
-#Still to do: Nicer showing of the graph and automated date creation! Otherwise very nice :D
+#Still to do: Nicer showing of the graph, I just want enitre number ticks, I do not want to define the maximum and automated date creation! Otherwise very nice :D
