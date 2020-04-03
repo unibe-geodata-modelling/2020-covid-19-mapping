@@ -12,19 +12,20 @@ inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität b
 #Downloading the CSV-Data
 #inputdata = urllib.request.urlopen("http://cowid.netlify.com/data/full_data.csv")
 
+print ("This is the inputdata: " + inputdata)
 
-#Inputdata aus Internet
 
 #What exactly is df?
 df=pd.read_csv(inputdata, sep=",")
+print (df)
 #What is this for?
-df.dtypes
-#Define "date" column as string values
-df["Country/Region"].astype('str')
-df["Province/State"].astype('str')
-#What are we doing here?
+df_Switzerland = pd.DataFrame(data=df,index="Switzerland")
+print (df_Switzerland)
 
-print ("This is the inputdata: " + inputdata)
+
+
+
+
 
 
 
