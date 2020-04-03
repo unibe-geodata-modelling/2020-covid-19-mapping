@@ -21,9 +21,11 @@ print (df_world)
 df_world.rename(columns={'Province/State':'Province','Country/Region':'Country'}, inplace=True)
 
 print(df_world)
-#What is this for?
-#df_Switzerland = df_world[df_world.Country/Region=="Switzerland"]
-#print (df_Switzerland)
+
+
+#Dataframe for Switzerland
+df_Switzerland = df_world[df_world.Country=="Switzerland"]
+print (df_Switzerland)
 
 
 
