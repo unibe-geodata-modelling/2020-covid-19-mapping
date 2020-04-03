@@ -16,11 +16,14 @@ print ("This is the inputdata: " + inputdata)
 
 
 #What exactly is df?
-df=pd.read_csv(inputdata, sep=",")
-print (df)
+df_world=pd.read_csv(inputdata, sep=",")
+print (df_world)
+df_world.rename(columns={'Province/State':'Province','Country/Region':'Country'}, inplace=True)
+
+print(df_world)
 #What is this for?
-df_Switzerland = pd.DataFrame(data=df,index="Switzerland")
-print (df_Switzerland)
+#df_Switzerland = df_world[df_world.Country/Region=="Switzerland"]
+#print (df_Switzerland)
 
 
 
