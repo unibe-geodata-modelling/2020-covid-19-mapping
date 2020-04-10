@@ -60,8 +60,8 @@ print(df_Italy)
 
 
 # Automated dataframe creation
-total_rows = df_world.count()
-
+total_rows = len(df_world.index)
+total_rows_list = range (1,total_rows)
 print(total_rows)
 
 print("Test March Switzerland")
@@ -69,10 +69,19 @@ march = range(1,31)
 Switzerland_040220 = df_world.at[206,'3/1/20']
 print (Switzerland_040220)
 for day in march:
-    date = '3/' + str(day) +'/20'
-    #naming = 'Switzerland' + date
-    Switzerland_March = df_world.at[206,date]
-    print (Switzerland_March)
+    date = '3/' + str(day) + '/20'
+    print (date)
+    for row in total_rows_list:
+        province = df_world.at[row, 'Province']
+        if pd.isna(province):
+            country = df_world.at[row, 'Country']
+            print(country)
+        else:
+            province = df_world.at[row, 'Province']
+            print(province)
+        #naming = 'Switzerland' + date
+        Switzerland_March = df_world.at[row,date]
+        print (Switzerland_March)
 #Maybe create loops for days and location?
 #Data for 1/22/20
 #for location in country_and_province:
