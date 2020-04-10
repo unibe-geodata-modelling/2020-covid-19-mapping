@@ -19,16 +19,13 @@ print("This is the inputdata: " + inputdata)
 
 #df_world = dataframe worldwide
 df_world = pd.read_csv(inputdata, sep=",")
-print(df_world)
 df_world.rename(columns={'Province/State': 'Province', 'Country/Region': 'Country'}, inplace=True)
 
 print(df_world)
 
 #Have a country list
 country_list_original = df_world['Country'].tolist()
-print(country_list_original)
 country_list_unique_all = np.unique(country_list_original)
-print (country_list_unique_all)
 #remove countries that have numbers broken down to provinces -> Automation?
 index_Canada = np.argwhere (country_list_unique_all == 'Canada')
 index_Australia = np.argwhere (country_list_unique_all == 'Australia')
@@ -66,6 +63,21 @@ print(df_Italy)
 total_rows = df_world.count()
 
 print(total_rows)
+
+print("Test March Switzerland")
+march = range(1,31)
+Switzerland_040220 = df_world.at[206,'3/1/20']
+print (Switzerland_040220)
+for day in march:
+    date = '3/' + str(day) +'/20'
+    #naming = 'Switzerland' + date
+    Switzerland_March = df_world.at[206,date]
+    print (Switzerland_March)
+#Maybe create loops for days and location?
+#Data for 1/22/20
+#for location in country_and_province:
+
+
 
 #ax = plt.axes(projection =ccrs.PlateCarree())
 #ax.coastlines()
