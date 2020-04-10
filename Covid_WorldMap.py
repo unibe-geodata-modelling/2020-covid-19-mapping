@@ -27,13 +27,27 @@ print(df_world)
 #Have a country list
 country_list_original = df_world['Country'].tolist()
 print(country_list_original)
-country_list_unique = np.unique(country_list_original)
+country_list_unique_all = np.unique(country_list_original)
+print (country_list_unique_all)
+#remove countries that have numbers broken down to provinces -> Automation?
+index_Canada = np.argwhere (country_list_unique_all == 'Canada')
+index_Australia = np.argwhere (country_list_unique_all == 'Australia')
+index_China = np.argwhere (country_list_unique_all == 'China')
+country_list_unique = np.delete (country_list_unique_all, [index_Australia, index_Canada, index_China])
 print (country_list_unique)
 # Have a Province list
 province_list_original = df_world['Province'].tolist()
 print(province_list_original)
-province_list_unique = np.unique(province_list_original)
-print (province_list_unique)
+province_list_unique_with_nan = np.unique(province_list_original)
+print (province_list_unique_with_nan)
+index_nan = np.argwhere(province_list_unique_with_nan == 'nan')
+province_list_unique = np.delete(province_list_unique_with_nan,index_nan)
+print(province_list_unique)
+#Bring lists together
+country_and_province = np.append(country_list_unique,province_list_unique)
+print("Here is the final list:")
+print(country_and_province)
+
 
 # Dataframe for Switzerland
 df_Switzerland = df_world[df_world.Country == "Switzerland"]
