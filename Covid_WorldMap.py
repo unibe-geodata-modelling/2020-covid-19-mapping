@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import urllib.request
+# Ask how to import GDAL packages etc. cartopy
+#import cartopy.crs as ccrs
+
 
 # Get Data
 inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/PyCharmProjects/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
@@ -14,12 +17,19 @@ inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität b
 
 print("This is the inputdata: " + inputdata)
 
-# What exactly is df?
+#df_world = dataframe worldwide
 df_world = pd.read_csv(inputdata, sep=",")
 print(df_world)
 df_world.rename(columns={'Province/State': 'Province', 'Country/Region': 'Country'}, inplace=True)
 
 print(df_world)
+
+#Have a country list
+country_list = df_world['Country'].tolist()
+print(country_list)
+# Have a Province list
+province_list = df_world['Province'].tolist()
+print(province_list)
 
 # Dataframe for Switzerland
 df_Switzerland = df_world[df_world.Country == "Switzerland"]
@@ -39,4 +49,7 @@ total_rows = df_world.count()
 
 print(total_rows)
 
+#ax = plt.axes(projection =ccrs.PlateCarree())
+#ax.coastlines()
+#plt.show()
 # Still to do: Nicer showing of the graph, I just want enitre number ticks, I do not want to define the maximum and automated date creation! Otherwise very nice :D
