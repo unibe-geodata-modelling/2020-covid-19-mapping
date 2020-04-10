@@ -25,11 +25,15 @@ df_world.rename(columns={'Province/State': 'Province', 'Country/Region': 'Countr
 print(df_world)
 
 #Have a country list
-country_list = df_world['Country'].tolist()
-print(country_list)
+country_list_original = df_world['Country'].tolist()
+print(country_list_original)
+country_list_unique = np.unique(country_list_original)
+print (country_list_unique)
 # Have a Province list
-province_list = df_world['Province'].tolist()
-print(province_list)
+province_list_original = df_world['Province'].tolist()
+print(province_list_original)
+province_list_unique = np.unique(province_list_original)
+print (province_list_unique)
 
 # Dataframe for Switzerland
 df_Switzerland = df_world[df_world.Country == "Switzerland"]
