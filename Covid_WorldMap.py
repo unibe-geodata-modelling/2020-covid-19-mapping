@@ -25,9 +25,14 @@ df_world.rename(columns={'Province/State': 'Province', 'Country/Region': 'Countr
 
 print(df_world)
 
+#Create a list of all dates
+#Create a header list
 header_list = df_world.columns.tolist()
+print("This is the header_list")
 print(header_list)
-print("This was the header_list")
+date_list = header_list[4:]
+print ("This is the date_list")
+print(date_list)
 
 #Have a country list
 country_list_original = df_world['Country'].tolist()
