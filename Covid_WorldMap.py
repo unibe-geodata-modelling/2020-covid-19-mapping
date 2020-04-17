@@ -5,11 +5,29 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import datetime
+import statistics
 from datetime import date
 import urllib.request
 # Ask how to import GDAL packages etc. cartopy
 #import cartopy.crs as ccrs
 
+def datetoheader(gregorian_date):
+    gregorian_date_string = str(gregorian_date)
+    gregorian_date_list = gregorian_date_string.split('-')
+    year_gregorian = gregorian_date_list[0]
+    year_header = year_gregorian[2:]
+    month_gregorian = gregorian_date_list[1]
+    if month_gregorian.startswith("0"):
+        month_header = month_gregorian[1]
+    else:
+        month_header = month_gregorian
+    day_gregorian = gregorian_date_list [2]
+    if day_gregorian.startswith("0"):
+        day_header = day_gregorian[1]
+    else:
+        day_header = day_gregorian
+    header_date = month_header + '/'+ day_header + '/' + year_header
+    return header_date
 
 # Get Data locally (2nd of April 2020)
 #inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/PyCharmProjects/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
@@ -90,7 +108,10 @@ for day in date_list:
         confirmed_cases = df_world.at[row,day]
         print (confirmed_cases)
 
-for day in date_list:
+
+date_list_adjusted = date_list[1:-1]
+print(date_list_adjusted)
+for day in date_list_adjusted:
     date_fractions = day.split('/')
     month = date_fractions[0]
     day_of_month = date_fractions[1]
@@ -102,17 +123,28 @@ for day in date_list:
     print(day0)
     print(day1)
     print(day2)
-    #print ("This is the day " + day)
+    print ("This is the day " + day)
     #Loop over all rows (Countries and Provinces)
     for row in total_rows_list:
         province = df_world.at[row, 'Province']
         if pd.isna(province):
             country = df_world.at[row, 'Country']
-            #print(country)
+            print(country)
         else:
             province = df_world.at[row, 'Province']
-            #print(province)
-        confirmed_cases = df_world.at[row,day]
+            print(province)
+        day0_header = datetoheader(day0)
+        day1_header = datetoheader(day1)
+        day2_header = datetoheader(day2)
+        confirmed_cases_day0 = df_world.at[row,day0_header]
+        confirmed_cases_day1 = df_world.at[row,day1_header]
+        confirmed_cases_day2 = df_world.at[row,day2_header]
+
+        confirmed_cases_days_0_1_2 = [confirmed_cases_day0,confirmed_cases_day1,confirmed_cases_day2]
+        print(confirmed_cases_days_0_1_2)
+
+        confirmed_cases_three_day_average = statistics.mean(confirmed_cases_days_0_1_2)
+        print(confirmed_cases_three_day_average)
         #print (confirmed_cases)
 
 
