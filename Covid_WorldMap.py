@@ -4,9 +4,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from datetime import date
 import urllib.request
 # Ask how to import GDAL packages etc. cartopy
 #import cartopy.crs as ccrs
+
 
 
 # Get Data
@@ -22,6 +24,10 @@ df_world = pd.read_csv(inputdata, sep=",")
 df_world.rename(columns={'Province/State': 'Province', 'Country/Region': 'Country'}, inplace=True)
 
 print(df_world)
+
+header_list = df_world.columns.tolist()
+print(header_list)
+print("This was the header_list")
 
 #Have a country list
 country_list_original = df_world['Country'].tolist()
@@ -86,6 +92,7 @@ for day in march:
 #Data for 1/22/20
 #for location in country_and_province:
 
+#Create list with all dates
 
 
 #ax = plt.axes(projection =ccrs.PlateCarree())
