@@ -109,8 +109,17 @@ for day in date_list:
         print (confirmed_cases)
 
 
+
+#Adjust date-list: remove first and last day to enable three day moving average
 date_list_adjusted = date_list[1:-1]
 print(date_list_adjusted)
+
+#Make new Dataframe with three day moving averages
+header_list_threedayaverage = ["Place","Lat","Lon"] + date_list_adjusted
+print(header_list_threedayaverage)
+df_world_threedayaverage = pd.DataFrame(index=header_list_threedayaverage)
+print(df_world_threedayaverage)
+
 for day in date_list_adjusted:
     date_fractions = day.split('/')
     month = date_fractions[0]
@@ -147,7 +156,7 @@ for day in date_list_adjusted:
         print(confirmed_cases_three_day_average)
         #print (confirmed_cases)
 
-
+print(df_world_threedayaverage)
 
 #for location in country_and_province:
 
