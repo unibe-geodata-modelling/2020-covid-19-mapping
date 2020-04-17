@@ -11,13 +11,11 @@ import urllib.request
 
 
 
-# Get Data
-inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/PyCharmProjects/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+# Get Data locally (2nd of April 2020)
+#inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/PyCharmProjects/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 
-# Downloading the CSV-Data
-# inputdata = urllib.request.urlopen("http://cowid.netlify.com/data/full_data.csv")
-
-print("This is the inputdata: " + inputdata)
+# Get Data from John Hopkins GitHub Repository
+inputdata = urllib.request.urlopen("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
 
 #df_world = dataframe worldwide
 df_world = pd.read_csv(inputdata, sep=",")
@@ -70,18 +68,17 @@ print(df_Germany)
 print(df_Italy)
 
 
-# Automated dataframe creation
+#Count the number of rows
 total_rows = len(df_world.index)
 total_rows_list = range (1,total_rows)
 print(total_rows)
 
-print("Test March Switzerland")
-march = range(1,31)
-Switzerland_040220 = df_world.at[206,'3/1/20']
-print (Switzerland_040220)
-for day in march:
-    date = '3/' + str(day) + '/20'
-    print (date)
+print("All days All countries and regions")
+
+#Loop over all columns (days)
+for day in date_list:
+    print ("This is the day " + day)
+    #Loop over all rows (Countries and Provinces)
     for row in total_rows_list:
         province = df_world.at[row, 'Province']
         if pd.isna(province):
@@ -91,7 +88,7 @@ for day in march:
             province = df_world.at[row, 'Province']
             print(province)
         #naming = 'Switzerland' + date
-        Switzerland_March = df_world.at[row,date]
+        Switzerland_March = df_world.at[row,day]
         print (Switzerland_March)
 #Maybe create loops for days and location?
 #Data for 1/22/20
