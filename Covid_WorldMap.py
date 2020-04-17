@@ -115,10 +115,21 @@ date_list_adjusted = date_list[1:-1]
 print(date_list_adjusted)
 
 #Make new Dataframe with three day moving averages
-header_list_threedayaverage = ["Place","Lat","Lon"] + date_list_adjusted
+header_list_threedayaverage = ["Lat","Lon"] + date_list_adjusted
 print(header_list_threedayaverage)
-df_world_threedayaverage = pd.DataFrame(index=header_list_threedayaverage)
+df_world_threedayaverage = pd.DataFrame(index=country_and_province ,columns=header_list_threedayaverage)
 print(df_world_threedayaverage)
+#fill lat and lon
+for row in total_rows_list:
+    lat = df_world.at[row,'Lat']
+    lon = df_world.at[row,'Long']
+    province = df_world.at[row, 'Province']
+    if pd.isna(province):
+        location = df_world.at[row, 'Country']
+    else:
+        location = df_world.at[row, 'Province']
+    print(location, lat, lon)
+
 
 for day in date_list_adjusted:
     date_fractions = day.split('/')
