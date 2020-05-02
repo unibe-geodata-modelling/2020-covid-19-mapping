@@ -164,6 +164,24 @@ for day in date_list_adjusted:
 
 print(df_world_threedayaverage)
 
+#Make a new dataframe to see newly infected (depending on three day average)
+df_world_new_cases = pd.DataFrame(index=country_and_province, columns=date_list_adjusted)
+print(df_world_new_cases)
+
+#Fill df_world_new_cases
+# For the first day
+for location in country_and_province:
+    df_world_new_cases.at[location, '1/23/20'] = df_world_threedayaverage.at[location, '1/23/20']
+#Loop for all following days
+for day in date_list_adjusted[1:]:
+    print(day)
+    column_number_day = date_list_adjusted.index(day)
+    day_yesterday = date_list_adjusted[column_number_day - 1]
+    for location in country_and_province:
+        df_world_new_cases.at[location , day] = df_world_threedayaverage.at[location,day] - df_world_threedayaverage.at[location, day_yesterday]
+
+print(df_world_new_cases)
+
 # I need to create subplots instead of plots
 for date_now in date_list_adjusted:
     map_name = "map_" + date_now
@@ -178,17 +196,21 @@ for date_now in date_list_adjusted:
 
     for location in country_and_province:
         confirmed_cases_value = df_world_threedayaverage.at[location, date_now]
+        new_cases = df_world_new_cases.at[location, date_now]
+        new_cases_ratio = new_cases/confirmed_cases_value
         if confirmed_cases_value > 0:
-            marker_color = 'white'
+            #marker_color = 'white'
+            marker_color = 'orange'
             marker_size = math.log(confirmed_cases_value)
             if marker_size < 1:
                 marker_size = 1
-            if confirmed_cases_value > 100:
+            #See changes in confirmed cases:
+            if new_cases == 0:
+                marker_color = 'green'
+            if new_cases_ratio < 0.1:
                 marker_color = 'yellow'
-                if confirmed_cases_value > 1000:
-                    marker_color = 'orange'
-                    if confirmed_cases_value > 10000:
-                        marker_color = 'red'
+            if new_cases_ratio > 0.2:
+                marker_color = 'red'
             plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
                      color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
     #subplot_row_number = (np.argwhere(date_list_adjusted == date_now))
