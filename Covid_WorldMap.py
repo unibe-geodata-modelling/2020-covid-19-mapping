@@ -197,3 +197,4 @@ for date_now in date_list_adjusted:
     plt.show()
     # plt.text(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
     # 'yay' , horizontalalignment='right', transform=ccrs.PlateCarree())
+#wheredoIcommit?
