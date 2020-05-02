@@ -1,15 +1,22 @@
 # NewProject
+
 # Information
 # Import Packages
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import numpy as np
 import pandas as pd
 import datetime
 import statistics
+import gdal
+import osgeo
+import cartopy.crs as ccrs
 from datetime import date
 import urllib.request
-# Ask how to import GDAL packages etc. cartopy
-#import cartopy.crs as ccrs
+from matplotlib.widgets import Slider, Button, RadioButtons
+import cartopy.feature as cfeature
+import imageio
+
 
 def datetoheader(gregorian_date):
     gregorian_date_string = str(gregorian_date)
@@ -21,157 +28,172 @@ def datetoheader(gregorian_date):
         month_header = month_gregorian[1]
     else:
         month_header = month_gregorian
-    day_gregorian = gregorian_date_list [2]
+    day_gregorian = gregorian_date_list[2]
     if day_gregorian.startswith("0"):
         day_header = day_gregorian[1]
     else:
         day_header = day_gregorian
-    header_date = month_header + '/'+ day_header + '/' + year_header
+    header_date = month_header + '/' + day_header + '/' + year_header
     return header_date
 
+
 # Get Data locally (2nd of April 2020)
-#inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/PyCharmProjects/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+# inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/PyCharmProjects/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 
 # Get Data from John Hopkins GitHub Repository --> RAW very important
-inputdata = urllib.request.urlopen("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
+inputdata = urllib.request.urlopen(
+    "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
 
-#df_world = dataframe worldwide
+# df_world = dataframe worldwide
 df_world = pd.read_csv(inputdata, sep=",")
 df_world.rename(columns={'Province/State': 'Province', 'Country/Region': 'Country'}, inplace=True)
 
 print(df_world)
 
-#Create a list of all dates
-#Create a header list
+# Create a list of all dates
+# Create a header list
 header_list = df_world.columns.tolist()
 print("This is the header_list")
 print(header_list)
 date_list = header_list[4:]
-print ("This is the date_list")
+print("This is the date_list")
 print(date_list)
 
-#Have a country list
+# Have a country list
 country_list_original = df_world['Country'].tolist()
 country_list_unique_all = np.unique(country_list_original)
-#remove countries that have numbers broken down to provinces -> Automation?
-index_Canada = np.argwhere (country_list_unique_all == 'Canada')
-index_Australia = np.argwhere (country_list_unique_all == 'Australia')
-index_China = np.argwhere (country_list_unique_all == 'China')
-country_list_unique = np.delete (country_list_unique_all, [index_Australia, index_Canada, index_China])
-print (country_list_unique)
+# remove countries that have numbers broken down to provinces -> Automation?
+index_Canada = np.argwhere(country_list_unique_all == 'Canada')
+index_Australia = np.argwhere(country_list_unique_all == 'Australia')
+index_China = np.argwhere(country_list_unique_all == 'China')
+country_list_unique = np.delete(country_list_unique_all, [index_Australia, index_Canada, index_China])
+print(country_list_unique)
 # Have a Province list
 province_list_original = df_world['Province'].tolist()
 print(province_list_original)
 province_list_unique_with_nan = np.unique(province_list_original)
-print (province_list_unique_with_nan)
+print(province_list_unique_with_nan)
 index_nan = np.argwhere(province_list_unique_with_nan == 'nan')
-province_list_unique = np.delete(province_list_unique_with_nan,index_nan)
+province_list_unique = np.delete(province_list_unique_with_nan, index_nan)
 print(province_list_unique)
-#Bring lists together
-country_and_province = np.append(country_list_unique,province_list_unique)
+# Bring lists together
+country_and_province_appended = np.append(country_list_unique, province_list_unique)
+country_and_province = np.unique(country_and_province_appended)
 print("Here is the final list:")
 print(country_and_province)
 
-
-# Dataframe for Switzerland
-#df_Switzerland = df_world[df_world.Country == "Switzerland"]
-#print(df_Switzerland)
-
-# Dataframes Europe
-#df_France = df_world[df_world.Country == "France"]
-#df_Germany = df_world[df_world.Country == "Germany"]
-#df_Italy = df_world[df_world.Country == "Italy"]
-#print (df_France)
-#print(df_Germany)
-#print(df_Italy)
-
-
-#Count the number of rows
+# Count the number of rows
 total_rows = len(df_world.index)
-total_rows_list = range (1,total_rows)
+total_rows_list = range(1, total_rows)
 print(total_rows)
 
 print("All days All countries and regions")
 
-#Loop over all columns (days)
+# Loop over all columns (days)
 for day in date_list:
-    print ("This is the day " + day)
-    #Loop over all rows (Countries and Provinces)
+    print("This is the day " + day)
+    # Loop over all rows (Countries and Provinces)
     for row in total_rows_list:
         province = df_world.at[row, 'Province']
         if pd.isna(province):
-            country = df_world.at[row, 'Country']
-            print(country)
+            location = df_world.at[row, 'Country']
         else:
-            province = df_world.at[row, 'Province']
-            print(province)
-        confirmed_cases = df_world.at[row,day]
-        print (confirmed_cases)
+            location = df_world.at[row, 'Province']
+        confirmed_cases = df_world.at[row, day]
+        print(location, confirmed_cases)
 
-
-
-#Adjust date-list: remove first and last day to enable three day moving average
+# Adjust date-list: remove first and last day to enable three day moving average
 date_list_adjusted = date_list[1:-1]
 print(date_list_adjusted)
 
-#Make new Dataframe with three day moving averages
-header_list_threedayaverage = ["Lat","Lon"] + date_list_adjusted
+# Make new Dataframe with three day moving averages
+header_list_threedayaverage = ["Lat", "Lon"] + date_list_adjusted
 print(header_list_threedayaverage)
-df_world_threedayaverage = pd.DataFrame(index=country_and_province ,columns=header_list_threedayaverage)
+df_world_threedayaverage = pd.DataFrame(index=country_and_province, columns=header_list_threedayaverage)
 print(df_world_threedayaverage)
-#fill lat and lon
+
+# fill lat and lon
 for row in total_rows_list:
-    lat = df_world.at[row,'Lat']
-    lon = df_world.at[row,'Long']
+    lat = df_world.at[row, 'Lat']
+    lon = df_world.at[row, 'Long']
     province = df_world.at[row, 'Province']
     if pd.isna(province):
         location = df_world.at[row, 'Country']
     else:
         location = df_world.at[row, 'Province']
     print(location, lat, lon)
+    df_world_threedayaverage.at[location, 'Lat'] = lat
+    df_world_threedayaverage.at[location, 'Lon'] = lon
 
+print(df_world_threedayaverage)
 
 for day in date_list_adjusted:
     date_fractions = day.split('/')
     month = date_fractions[0]
     day_of_month = date_fractions[1]
     year = "20" + date_fractions[2]
-    print ("day = " + day,"year = " + year, "month = " + month, "day_of_the_month = " + day_of_month)
-    day1 = datetime.date(int(year),int(month),int(day_of_month))
+    print("day = " + day, "year = " + year, "month = " + month, "day_of_the_month = " + day_of_month)
+    day1 = datetime.date(int(year), int(month), int(day_of_month))
     day0 = day1 - datetime.timedelta(days=1)
     day2 = day1 + datetime.timedelta(days=1)
     print(day0)
     print(day1)
     print(day2)
-    print ("This is the day " + day)
-    #Loop over all rows (Countries and Provinces)
+    print("This is the day " + day)
+    # Loop over all rows (Countries and Provinces)
     for row in total_rows_list:
-        province = df_world.at[row, 'Province']
-        if pd.isna(province):
-            country = df_world.at[row, 'Country']
-            print(country)
+        location = df_world.at[row, 'Province']
+        if pd.isna(location):
+            location = df_world.at[row, 'Country']
         else:
-            province = df_world.at[row, 'Province']
-            print(province)
+            location = df_world.at[row, 'Province']
+        print(location)
         day0_header = datetoheader(day0)
         day1_header = datetoheader(day1)
         day2_header = datetoheader(day2)
-        confirmed_cases_day0 = df_world.at[row,day0_header]
-        confirmed_cases_day1 = df_world.at[row,day1_header]
-        confirmed_cases_day2 = df_world.at[row,day2_header]
+        confirmed_cases_day0 = df_world.at[row, day0_header]
+        confirmed_cases_day1 = df_world.at[row, day1_header]
+        confirmed_cases_day2 = df_world.at[row, day2_header]
 
-        confirmed_cases_days_0_1_2 = [confirmed_cases_day0,confirmed_cases_day1,confirmed_cases_day2]
+        confirmed_cases_days_0_1_2 = [confirmed_cases_day0, confirmed_cases_day1, confirmed_cases_day2]
         print(confirmed_cases_days_0_1_2)
 
         confirmed_cases_three_day_average = statistics.mean(confirmed_cases_days_0_1_2)
-        print(confirmed_cases_three_day_average)
-        #print (confirmed_cases)
+        df_world_threedayaverage.at[location, day1_header] = confirmed_cases_three_day_average
 
 print(df_world_threedayaverage)
 
-#for location in country_and_province:
+# I need to create subplots instead of plots
+for date_now in date_list_adjusted:
+    map_name = "map_" + date_now
+    map = plt.figure(num=map_name, figsize=[12.8, 8])
+    #plt.title("Confirmed Cases on " + date_now)
+    geo_axes = map.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+    geo_axes.set_global()
+    geo_axes.stock_img()
+    geo_axes.coastlines()
+    geo_axes.add_feature(cfeature.BORDERS, linestyle=':')
+    geo_axes.grid(False)
 
-
-#ax = plt.axes(projection =ccrs.PlateCarree())
-#ax.coastlines()
-#plt.show()
+    for location in country_and_province:
+        confirmed_cases_value = df_world_threedayaverage.at[location, date_now]
+        if confirmed_cases_value > 0:
+            marker_color = 'white'
+            marker_size = 1
+            if confirmed_cases_value > 100:
+                marker_color = 'yellow'
+                marker_size = 5
+                if confirmed_cases_value > 1000:
+                    marker_color = 'orange'
+                    marker_size = 10
+                    if confirmed_cases_value > 10000:
+                        marker_color = 'red'
+                        marker_size = 20
+            plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
+                     color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
+    #subplot_row_number = (np.argwhere(date_list_adjusted == date_now))
+    #plt.title(date_now)
+    print(date_now + " plot was created")
+    plt.show()
+    # plt.text(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
+    # 'yay' , horizontalalignment='right', transform=ccrs.PlateCarree())
