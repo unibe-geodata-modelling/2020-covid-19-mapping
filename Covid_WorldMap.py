@@ -7,6 +7,7 @@ import matplotlib.image as mpimg
 import numpy as np
 import pandas as pd
 import datetime
+import math
 import statistics
 import gdal
 import osgeo
@@ -179,16 +180,15 @@ for date_now in date_list_adjusted:
         confirmed_cases_value = df_world_threedayaverage.at[location, date_now]
         if confirmed_cases_value > 0:
             marker_color = 'white'
-            marker_size = 1
+            marker_size = math.log(confirmed_cases_value)
+            if marker_size < 1:
+                marker_size = 1
             if confirmed_cases_value > 100:
                 marker_color = 'yellow'
-                marker_size = 5
                 if confirmed_cases_value > 1000:
                     marker_color = 'orange'
-                    marker_size = 10
                     if confirmed_cases_value > 10000:
                         marker_color = 'red'
-                        marker_size = 20
             plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
                      color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
     #subplot_row_number = (np.argwhere(date_list_adjusted == date_now))
