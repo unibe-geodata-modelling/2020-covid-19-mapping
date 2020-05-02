@@ -205,12 +205,12 @@ for date_now in date_list_adjusted:
             if marker_size < 1:
                 marker_size = 1
             #See changes in confirmed cases:
-            if new_cases == 0:
-                marker_color = 'green'
             if new_cases_ratio < 0.1:
                 marker_color = 'yellow'
             if new_cases_ratio > 0.2:
                 marker_color = 'red'
+            if new_cases == 0:
+                marker_color = 'greenyellow'
             plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
                      color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
     #subplot_row_number = (np.argwhere(date_list_adjusted == date_now))
@@ -219,5 +219,3 @@ for date_now in date_list_adjusted:
     plt.show()
     # plt.text(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
     # 'yay' , horizontalalignment='right', transform=ccrs.PlateCarree())
-#wheredoIcommit?
-#new commit possible?
