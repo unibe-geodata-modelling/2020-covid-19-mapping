@@ -192,6 +192,7 @@ for date_now in date_list_adjusted:
     geo_axes.coastlines()
     geo_axes.add_feature(cfeature.BORDERS, linestyle=':')
     geo_axes.grid(False)
+    geo_axes.set_title("Confirmed Cases of Corona Patients on {} and trend".format(date_now))
 
     for location in country_and_province:
         confirmed_cases_value = df_world_threedayaverage.at[location, date_now]
