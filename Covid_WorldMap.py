@@ -148,7 +148,6 @@ for day in date_list_adjusted:
             location = df_world.at[row, 'Country']
         else:
             location = df_world.at[row, 'Province']
-        print(location)
         day0_header = datetoheader(day0)
         day1_header = datetoheader(day1)
         day2_header = datetoheader(day2)
@@ -157,7 +156,7 @@ for day in date_list_adjusted:
         confirmed_cases_day2 = df_world.at[row, day2_header]
 
         confirmed_cases_days_0_1_2 = [confirmed_cases_day0, confirmed_cases_day1, confirmed_cases_day2]
-        print(confirmed_cases_days_0_1_2)
+        print(location, confirmed_cases_days_0_1_2)
 
         confirmed_cases_three_day_average = statistics.mean(confirmed_cases_days_0_1_2)
         df_world_threedayaverage.at[location, day1_header] = confirmed_cases_three_day_average
@@ -216,6 +215,8 @@ for date_now in date_list_adjusted:
     #subplot_row_number = (np.argwhere(date_list_adjusted == date_now))
     #plt.title(date_now)
     print(date_now + " plot was created")
-    plt.show()
+    plt.show(block = False)
+    plt.pause(1)
+    plt.close()
     # plt.text(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
     # 'yay' , horizontalalignment='right', transform=ccrs.PlateCarree())
