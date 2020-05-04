@@ -85,7 +85,7 @@ print(country_and_province)
 
 # Count the number of rows
 total_rows = len(df_world.index)
-total_rows_list = range(1, total_rows)
+total_rows_list = range(0, total_rows)
 print(total_rows)
 
 print("All days All countries and regions")
@@ -181,23 +181,58 @@ for day in date_list_adjusted[1:]:
 
 print(df_world_new_cases)
 
+# Make new dataframe to calculate relative new infected cases
+value_for_change_from_zero_to_something = 999
+df_world_change_cases = pd.DataFrame(index=country_and_province, columns=date_list_adjusted)
+for location in country_and_province:
+    if df_world_threedayaverage.at[location, '1/23/20'] > 0:
+        df_world_change_cases.at[location, '1/23/20'] = value_for_change_from_zero_to_something
+    else:
+        df_world_change_cases.at[location, '1/23/20'] = 0
+for day in date_list_adjusted[1:]:
+    print(day)
+    column_number_day = date_list_adjusted.index(day)
+    day_yesterday = date_list_adjusted[column_number_day - 1]
+    for location in country_and_province:
+        new_cases_today = df_world_new_cases.at[location,day]
+        new_cases_yesterday = df_world_new_cases.at[location,day_yesterday]
+        if new_cases_yesterday == 0:
+            new_cases_ratio = value_for_change_from_zero_to_something
+            if new_cases_today == 0:
+                new_cases_ratio = 0
+        else:
+            new_cases_ratio = new_cases_today/new_cases_yesterday
+        print("location: ", location, "today: ", day , "yesterday: ", day_yesterday, "new cases today: ", new_cases_today,
+              "new cases yesterday: ", new_cases_yesterday, "new cases ratio: ", new_cases_ratio)
+        df_world_change_cases.at[location, day] = new_cases_ratio
+
+print(df_world_change_cases)
+
 # I need to create subplots instead of plots
 for date_now in date_list_adjusted:
     map_name = "map_" + date_now
-    map = plt.figure(num=map_name, figsize=[12.8, 8])
+    fig = plt.figure(num=map_name, figsize=[12.8, 8])
+    ax = plt.axes(projection=ccrs.PlateCarree())
+    ax.set_global()
+    ax.add_feature(cfeature.LAND)
+    ax.add_feature(cfeature.OCEAN)
+    ax.add_feature(cfeature.COASTLINE)
+    ax.add_feature(cfeature.BORDERS, linestyle=":")
+    ax.set_title("Confirmed Cases of Corona Patients on {} and trend per country or province".format(date_now))
     #plt.title("Confirmed Cases on " + date_now)
-    geo_axes = map.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
-    geo_axes.set_global()
-    geo_axes.stock_img()
-    geo_axes.coastlines()
-    geo_axes.add_feature(cfeature.BORDERS, linestyle=':')
-    geo_axes.grid(False)
-    geo_axes.set_title("Confirmed Cases of Corona Patients on {} and trend".format(date_now))
+    #geo_axes = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+    #geo_axes.set_global()
+    #geo_axes.stock_img()
+    #geo_axes.coastlines()
+    #geo_axes.add_feature(cfeature.BORDERS, linestyle=':')
+    #geo_axes.grid(False)
+    #geo_axes.set_title("Confirmed Cases of Corona Patients on {} and trend".format(date_now))
 
     for location in country_and_province:
         confirmed_cases_value = df_world_threedayaverage.at[location, date_now]
         new_cases = df_world_new_cases.at[location, date_now]
-        new_cases_ratio = new_cases/confirmed_cases_value
+        #new_cases_ratio = new_cases/confirmed_cases_value
+        new_change_cases = df_world_change_cases.at[location, date_now]
         if confirmed_cases_value > 0:
             #marker_color = 'white'
             marker_color = 'orange'
@@ -205,9 +240,9 @@ for date_now in date_list_adjusted:
             if marker_size < 1:
                 marker_size = 1
             #See changes in confirmed cases:
-            if new_cases_ratio < 0.1:
+            if new_change_cases < 0.9:
                 marker_color = 'yellow'
-            if new_cases_ratio > 0.2:
+            if new_change_cases > 1.1:
                 marker_color = 'red'
             if new_cases == 0:
                 marker_color = 'greenyellow'
@@ -217,7 +252,7 @@ for date_now in date_list_adjusted:
     #plt.title(date_now)
     print(date_now + " plot was created")
     plt.show(block = False)
-    plt.pause(1)
+    plt.pause(0.5)
     plt.close()
     # plt.text(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
     # 'yay' , horizontalalignment='right', transform=ccrs.PlateCarree())
