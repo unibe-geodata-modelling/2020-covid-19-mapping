@@ -50,6 +50,7 @@ df_world = pd.read_csv(inputdata, sep=",")
 df_world.rename(columns={'Province/State': 'Province', 'Country/Region': 'Country'}, inplace=True)
 
 print(df_world)
+print("BREAK")
 
 # Create a list of all dates
 # Create a header list
@@ -59,6 +60,52 @@ print(header_list)
 date_list = header_list[4:]
 print("This is the date_list")
 print(date_list)
+index_12thofApril = date_list.index("4/12/20")
+
+#Getting US-country-level data and appending it to world data frame immediately
+for date in date_list[index_12thofApril:]:
+    print("Date for the loop: ",date)
+    date_fractions = date.split('/')
+    day = date_fractions [1]
+    month = date_fractions [0]
+    year = "20" + date_fractions[2]
+    print("day: ", day, "month:", month)
+    # Make US-Date-Format out of it
+    if len(month) == 2:
+        month_url = month
+    else:
+        month_url = '0'+ month
+    if len(day) == 2:
+        day_url = day
+    else:
+        day_url = '0'+ day
+
+    date_url = month_url + '-' + day_url + '-' + year
+    print(date_url)
+
+    usdailyreport = urllib.request.urlopen(
+        "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports_us/{}.csv".format(date_url))
+
+    df_us_daily = pd.read_csv(usdailyreport, sep=",")
+    df_us_daily.rename(columns={'Province_State':'Province','Country_Region':'Country','Long_':'Long'},inplace=True)
+    df_us_daily.set_index('Province',drop=False, inplace=True)
+    df_us_daily = df_us_daily.drop(columns=["Last_Update","Deaths","Recovered","Active","FIPS","Incident_Rate","People_Tested","People_Hospitalized","Mortality_Rate","UID","ISO3","Testing_Rate","Hospitalization_Rate"])
+    if 'Recovered' in df_us_daily.index:
+        df_us_daily = df_us_daily.drop(index=['Recovered'])
+    if 'Diamond Princess' in df_us_daily.index:
+        df_us_daily = df_us_daily.drop(index=['Diamond Princess'])
+    #Check for this one
+    if 'Grand Princess' in df_us_daily.index:
+        df_us_daily = df_us_daily.drop(index = ['Grand Princess'])
+    print(df_us_daily)
+
+    #Append the data to the world data frame
+    if date == '4/12/20':
+        df_us_daily.rename(columns={'Confirmed':'4/12/20'})
+        df_world.append(df_us_daily,ignore_index = True)
+        print(df_world)
+
+print(df_world)
 
 # Have a country list
 country_list_original = df_world['Country'].tolist()
