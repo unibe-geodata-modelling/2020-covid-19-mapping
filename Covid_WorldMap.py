@@ -182,8 +182,9 @@ for day in date_list_adjusted[1:]:
 print(df_world_new_cases)
 
 # Make new dataframe to calculate relative new infected cases
-value_for_change_from_zero_to_something = 999
 df_world_change_cases = pd.DataFrame(index=country_and_province, columns=date_list_adjusted)
+value_for_change_from_zero_to_something = 999
+
 for location in country_and_province:
     if df_world_threedayaverage.at[location, '1/23/20'] > 0:
         df_world_change_cases.at[location, '1/23/20'] = value_for_change_from_zero_to_something
@@ -210,6 +211,8 @@ print(df_world_change_cases)
 
 # I need to create subplots instead of plots
 for date_now in date_list_adjusted:
+    date_now_index = date_list_adjusted.index(date_now)
+    date_tomorrow_index = date_now_index + 1
     map_name = "map_" + date_now
     fig = plt.figure(num=map_name, figsize=[12.8, 8])
     ax = plt.axes(projection=ccrs.PlateCarree())
@@ -246,6 +249,16 @@ for date_now in date_list_adjusted:
                 marker_color = 'red'
             if new_cases == 0:
                 marker_color = 'greenyellow'
+                zero_infections_streak = 0
+                print("We have 0 new cases on {} in {}!".format(date_now,location))
+                for date_counter in date_list_adjusted[:date_tomorrow_index]:
+                    newly_infected = df_world_new_cases.at[location,date_counter]
+                    if newly_infected == 0:
+                        zero_infections_streak = zero_infections_streak + 1
+                    else:
+                        zero_infections_streak = 0
+                if zero_infections_streak >= 14:
+                    marker_color = "green"
             plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
                      color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
     #subplot_row_number = (np.argwhere(date_list_adjusted == date_now))
