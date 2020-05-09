@@ -62,7 +62,28 @@ print("This is the date_list")
 print(date_list)
 index_12thofApril = date_list.index("4/12/20")
 
-#Getting US-country-level data and appending it to world data frame immediately
+#Get Data from 12th of April and append Dataframe World
+us12april = urllib.request.urlopen(
+    "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports_us/04-12-2020.csv")
+
+df_us12april = pd.read_csv(us12april, sep=",")
+df_us12april.rename(columns={'Province_State': 'Province', 'Country_Region': 'Country', 'Long_': 'Long'}, inplace=True)
+df_us12april.set_index('Province', drop=False, inplace=True)
+df_us12april = df_us12april.drop(
+    columns=["Last_Update","Confirmed", "Deaths", "Recovered", "Active", "FIPS", "Incident_Rate", "People_Tested",
+             "People_Hospitalized", "Mortality_Rate", "UID", "ISO3", "Testing_Rate", "Hospitalization_Rate"])
+if 'Recovered' in df_us12april.index:
+    df_us12april = df_us12april.drop(index=['Recovered'])
+if 'Diamond Princess' in df_us12april.index:
+    df_us12april = df_us12april.drop(index=['Diamond Princess'])
+# Check for this one
+if 'Grand Princess' in df_us12april.index:
+    df_us12april = df_us12april.drop(index=['Grand Princess'])
+print(df_us12april)
+df_world = df_world.append(df_us12april,ignore_index = True)
+print(df_world)
+
+#Getting US-country-level data filling the dataframe
 for date in date_list[index_12thofApril:]:
     print("Date for the loop: ",date)
     date_fractions = date.split('/')
@@ -98,10 +119,8 @@ for date in date_list[index_12thofApril:]:
     if 'Grand Princess' in df_us_daily.index:
         df_us_daily = df_us_daily.drop(index = ['Grand Princess'])
     print(df_us_daily)
-
+# NEW IDEA: Seperately do the thing for 4/12/20 (append to dataframe world. Then fill the dataframe with data over the loop.)
     #Append the data to the world data frame
-    if date == '4/12/20':
-        df_us_daily.rename(columns={'Confirmed':'4/12/20'})
         df_world.append(df_us_daily,ignore_index = True)
         print(df_world)
 
