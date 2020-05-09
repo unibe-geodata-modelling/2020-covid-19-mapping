@@ -82,8 +82,9 @@ if 'Grand Princess' in df_us12april.index:
 print(df_us12april)
 df_world = df_world.append(df_us12april,ignore_index = True)
 print(df_world)
+# Fill with zeros before 12th of April
 
-#Getting US-country-level data filling the dataframe
+#Getting US-country-level data filling the dataframe after 12th of April and deleting US country number!
 for date in date_list[index_12thofApril:]:
     print("Date for the loop: ",date)
     date_fractions = date.split('/')
@@ -119,10 +120,8 @@ for date in date_list[index_12thofApril:]:
     if 'Grand Princess' in df_us_daily.index:
         df_us_daily = df_us_daily.drop(index = ['Grand Princess'])
     print(df_us_daily)
-# NEW IDEA: Seperately do the thing for 4/12/20 (append to dataframe world. Then fill the dataframe with data over the loop.)
-    #Append the data to the world data frame
-        df_world.append(df_us_daily,ignore_index = True)
-        print(df_world)
+
+
 
 print(df_world)
 
