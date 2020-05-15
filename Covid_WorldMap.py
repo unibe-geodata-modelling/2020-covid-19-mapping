@@ -82,11 +82,29 @@ if 'Grand Princess' in df_us12april.index:
 print(df_us12april)
 df_world = df_world.append(df_us12april,ignore_index = True)
 print(df_world)
+
+df_world_province_list = df_world['Province'].tolist()
+df_world_country_list = df_world['Country'].tolist()
+df_world_columns_list = df_world.columns.tolist()
+#print(df_world_index_list)
+print(df_world_columns_list)
+#Get a state list
+state_list = df_us12april.index.tolist()
+print(state_list)
+
 # Fill with zeros before 12th of April
+for date in date_list[:index_12thofApril]:
+    for state in state_list:
+        index_number_state = df_world_province_list.index(state)
+        column_number_date = df_world_columns_list.index(date)
+        df_world.iat[index_number_state, column_number_date] = 0
+print(df_world)
+
+
 
 #Getting US-country-level data filling the dataframe after 12th of April and deleting US country number!
 for date in date_list[index_12thofApril:]:
-    print("Date for the loop: ",date)
+    print('Date for the loop: ', date)
     date_fractions = date.split('/')
     day = date_fractions [1]
     month = date_fractions [0]
@@ -116,12 +134,18 @@ for date in date_list[index_12thofApril:]:
         df_us_daily = df_us_daily.drop(index=['Recovered'])
     if 'Diamond Princess' in df_us_daily.index:
         df_us_daily = df_us_daily.drop(index=['Diamond Princess'])
-    #Check for this one
+    #Check for this one in df_world
     if 'Grand Princess' in df_us_daily.index:
         df_us_daily = df_us_daily.drop(index = ['Grand Princess'])
     print(df_us_daily)
-
-
+    #Set United States in df_world to zero
+    column_number_date = df_world_columns_list.index(date)
+    united_states_index = df_world_country_list.index('US')
+    print(united_states_index)
+    df_world.iat[united_states_index, column_number_date] = 0
+    for state in state_list:
+        index_number_state = df_world_province_list.index(state)
+        df_world.iat[index_number_state, column_number_date] = df_us_daily.at[state,'Confirmed']
 
 print(df_world)
 
