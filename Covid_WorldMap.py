@@ -438,6 +438,7 @@ def corona_map(date_map):
     plt.show()
 
 #for date in date_list_adjusted:
+    #corona_map(date)
 corona_map('4/10/20')
 corona_map('4/11/20')
 corona_map('4/12/20')
