@@ -3,8 +3,12 @@
 # Information
 # Import Packages
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import matplotlib.image as mpimg
+import matplotlib.colors as colors
+from matplotlib.colors import ListedColormap
 import numpy as np
+import numpy.ma as ma
 import pandas as pd
 import datetime
 import math
@@ -18,6 +22,7 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 import cartopy.feature as cfeature
 import imageio
 
+#Find a solution for 11/12th of April for moving average
 
 def datetoheader(gregorian_date):
     gregorian_date_string = str(gregorian_date)
@@ -61,6 +66,9 @@ date_list = header_list[4:]
 print("This is the date_list")
 print(date_list)
 index_12thofApril = date_list.index("4/12/20")
+index_13thofApril = date_list.index("4/13/20")
+transition_period_list = [index_12thofApril,index_13thofApril]
+transition_period_list_dates = ['4/12/20','4/13/20']
 
 #Get Data from 12th of April and append Dataframe World
 us12april = urllib.request.urlopen(
@@ -138,11 +146,16 @@ for date in date_list[index_12thofApril:]:
     if 'Grand Princess' in df_us_daily.index:
         df_us_daily = df_us_daily.drop(index = ['Grand Princess'])
     print(df_us_daily)
+    #I have state-wide data from the 12th of April -> I can have a threeday-average from the 13th of April.
+    #I need threeday-average of US until 12th of April -> I need raw data from US until 13th of April.
     #Set United States in df_world to zero
     column_number_date = df_world_columns_list.index(date)
-    united_states_index = df_world_country_list.index('US')
-    print(united_states_index)
-    df_world.iat[united_states_index, column_number_date] = 0
+    if date in transition_period_list:
+        print("Transition phase, let's keep all the data yay")
+    else:
+        united_states_index = df_world_country_list.index('US')
+        print(united_states_index)
+        df_world.iat[united_states_index, column_number_date] = 0
     for state in state_list:
         index_number_state = df_world_province_list.index(state)
         df_world.iat[index_number_state, column_number_date] = df_us_daily.at[state,'Confirmed']
@@ -250,6 +263,10 @@ for day in date_list_adjusted:
         confirmed_cases_three_day_average = statistics.mean(confirmed_cases_days_0_1_2)
         df_world_threedayaverage.at[location, day1_header] = confirmed_cases_three_day_average
 
+df_world_threedayaverage.at['US','4/13/20']=0
+for state in state_list:
+    df_world_threedayaverage.at[state,'4/12/20']=0
+    df_world_threedayaverage.at[state, '4/11/20'] = 0
 print(df_world_threedayaverage)
 
 #Make a new dataframe to see newly infected (depending on three day average)
@@ -299,62 +316,132 @@ for day in date_list_adjusted[1:]:
 print(df_world_change_cases)
 
 # I need to create subplots instead of plots
-for date_now in date_list_adjusted:
-    date_now_index = date_list_adjusted.index(date_now)
-    date_tomorrow_index = date_now_index + 1
-    map_name = "map_" + date_now
-    fig = plt.figure(num=map_name, figsize=[12.8, 8])
+#for date_now in date_list_adjusted:
+    #date_now_index = date_list_adjusted.index(date_now)
+    #date_tomorrow_index = date_now_index + 1
+    #map_name = "map_" + date_now
+    #fig = plt.figure(num=map_name, figsize=[12.8, 8])
+    #ax = plt.axes(projection=ccrs.PlateCarree())
+    #ax.set_global()
+    #ax.add_feature(cfeature.LAND)
+    #ax.add_feature(cfeature.OCEAN)
+    #ax.add_feature(cfeature.COASTLINE)
+    #ax.add_feature(cfeature.BORDERS, linestyle=":")
+    #ax.set_title("Confirmed Cases of Corona Patients on {} and trend per country or province".format(date_now))
+
+    #for location in country_and_province:
+        #confirmed_cases_value = df_world_threedayaverage.at[location, date_now]
+        #new_cases = df_world_new_cases.at[location, date_now]
+        #new_cases_ratio = new_cases/confirmed_cases_value
+        #new_change_cases = df_world_change_cases.at[location, date_now]
+        #if confirmed_cases_value > 0:
+            #marker_color = 'white'
+            #marker_color = 'orange'
+            #marker_size = math.log(confirmed_cases_value)
+            #if marker_size < 1:
+                #marker_size = 1
+            #See changes in confirmed cases:
+            #if new_change_cases < 0.9:
+                #marker_color = 'yellow'
+            #if new_change_cases > 1.1:
+                #marker_color = 'red'
+            #if new_cases == 0:
+                #marker_color = 'greenyellow'
+                #zero_infections_streak = 0
+                #print("We have 0 new cases on {} in {}!".format(date_now,location))
+                #for date_counter in date_list_adjusted[:date_tomorrow_index]:
+                    #newly_infected = df_world_new_cases.at[location,date_counter]
+                    #if newly_infected == 0:
+                        #zero_infections_streak = zero_infections_streak + 1
+                    #else:
+                        #zero_infections_streak = 0
+                #if zero_infections_streak >= 14:
+                    #marker_color = "green"
+            #plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
+                     #color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
+    #subplot_row_number = (np.argwhere(date_list_adjusted == date_now))
+    #plt.title(date_now)
+    #print(date_now + " plot was created")
+    #plt.show(block = False)
+    #plt.pause(0.5)
+    #plt.close()
+
+    # plt.text(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
+    # 'yay' , horizontalalignment='right', transform=ccrs.PlateCarree())
+
+def corona_map(date_map):
+    lat = df_world_threedayaverage['Lat']
+    lon = df_world_threedayaverage['Lon']
+    threedayaverage_map = df_world_threedayaverage[date_map]
+    print(type(threedayaverage_map))
+    s_linear = threedayaverage_map.astype('float64')
+    print(type(s_linear))
+    s_log = np.log(s_linear)
+    s_square = np.square(s_log)
+    print(type(s_square))
+    masked_threedayaverage = ma.masked_equal(threedayaverage_map,0)
+    #threedayaverage_map_log = float(math.log(threedayaverage_map))
+    newly_infected_map = df_world_new_cases[date_map]
+    new_infection_rate_map = df_world_change_cases[date_map]
+    fig = plt.figure(num="Corona Map", figsize=(12.8, 8))
     ax = plt.axes(projection=ccrs.PlateCarree())
-    ax.set_global()
     ax.add_feature(cfeature.LAND)
     ax.add_feature(cfeature.OCEAN)
     ax.add_feature(cfeature.COASTLINE)
-    ax.add_feature(cfeature.BORDERS, linestyle=":")
-    ax.set_title("Confirmed Cases of Corona Patients on {} and trend per country or province".format(date_now))
-    #plt.title("Confirmed Cases on " + date_now)
-    #geo_axes = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
-    #geo_axes.set_global()
-    #geo_axes.stock_img()
-    #geo_axes.coastlines()
-    #geo_axes.add_feature(cfeature.BORDERS, linestyle=':')
-    #geo_axes.grid(False)
-    #geo_axes.set_title("Confirmed Cases of Corona Patients on {} and trend".format(date_now))
+    ax.add_feature(cfeature.BORDERS, linestyle=':')
+    ax.coastlines()
+    ax.set_global()
+    ax.stock_img()
+    #norming the colorbar
+    divnorm = colors.DivergingNorm(vmin = 0, vcenter = 1, vmax = 2)
+    #adding limegreen to the hot_r colormap
+    hot_r = cm.get_cmap('hot_r', 256)
+    newcolors = hot_r(np.linspace(0, 1, 256))
+    #limegreen = np.array([0, 255 / 256, 0, 1])
+    #newcolors[:5, :] = limegreen
+    #newcolors2 = newcolors[:-10]
+    #newcmp = ListedColormap(newcolors2)
 
+    plt.scatter(lon, lat, transform=ccrs.PlateCarree(),
+        label=None, s= s_square, c=new_infection_rate_map, cmap='YlOrRd',norm = divnorm,linewidth=0,zorder=3)
+    #if 0 new cases make limegreen:
     for location in country_and_province:
-        confirmed_cases_value = df_world_threedayaverage.at[location, date_now]
-        new_cases = df_world_new_cases.at[location, date_now]
-        #new_cases_ratio = new_cases/confirmed_cases_value
-        new_change_cases = df_world_change_cases.at[location, date_now]
-        if confirmed_cases_value > 0:
-            #marker_color = 'white'
-            marker_color = 'orange'
-            marker_size = math.log(confirmed_cases_value)
-            if marker_size < 1:
-                marker_size = 1
-            #See changes in confirmed cases:
-            if new_change_cases < 0.9:
-                marker_color = 'yellow'
-            if new_change_cases > 1.1:
-                marker_color = 'red'
-            if new_cases == 0:
+        confirmed_cases_three_day_average = df_world_threedayaverage.at[location,date_map]
+        new_cases_today = df_world_new_cases.at[location,date_map]
+        if confirmed_cases_three_day_average > 0:
+            if new_cases_today == 0:
+                marker_size = math.log(confirmed_cases_three_day_average)
                 marker_color = 'greenyellow'
                 zero_infections_streak = 0
-                print("We have 0 new cases on {} in {}!".format(date_now,location))
-                for date_counter in date_list_adjusted[:date_tomorrow_index]:
-                    newly_infected = df_world_new_cases.at[location,date_counter]
-                    if newly_infected == 0:
-                        zero_infections_streak = zero_infections_streak + 1
-                    else:
-                        zero_infections_streak = 0
-                if zero_infections_streak >= 14:
-                    marker_color = "green"
-            plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
-                     color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
-    #subplot_row_number = (np.argwhere(date_list_adjusted == date_now))
-    #plt.title(date_now)
-    print(date_now + " plot was created")
-    plt.show(block = False)
-    plt.pause(0.5)
-    plt.close()
-    # plt.text(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
-    # 'yay' , horizontalalignment='right', transform=ccrs.PlateCarree())
+                print("We have 0 new cases on {} in {}!".format(date_map,location))
+                date_now_index = date_list_adjusted.index(date_map)
+                date_tomorrow_index = date_now_index + 1
+                # if 14 days no new cases make dark green:
+                #for date_counter in date_list_adjusted[:date_tomorrow_index]:
+                    #newly_infected = df_world_new_cases.at[location,date_counter]
+                    #if newly_infected == 0:
+                        #zero_infections_streak = zero_infections_streak + 1
+                    #else:
+                        #zero_infections_streak = 0
+                    #if zero_infections_streak >= 14:
+                        #marker_color = "green"
+                plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
+                         color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree(), zorder =5)
+
+    plt.axis(aspect='equal')
+    plt.xlabel('longitude')
+    plt.ylabel('latitude')
+    plt.colorbar(label='Relative new Corona Cases on {}'.format(date_map))
+    #plt.show(block = False)
+    #plt.pause(0.5)
+    #plt.close()
+    plt.show()
+
+#for date in date_list_adjusted:
+corona_map('4/10/20')
+corona_map('4/11/20')
+corona_map('4/12/20')
+corona_map('4/13/20')
+corona_map('4/14/20')
+corona_map('4/15/20')
+
