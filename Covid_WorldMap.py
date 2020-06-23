@@ -21,7 +21,7 @@ import urllib.request
 from matplotlib.widgets import Slider, Button, RadioButtons
 import cartopy.feature as cfeature
 import imageio
-
+pd.set_option("display.max_rows", None, "display.max_columns", None)
 #Find a solution for 11/12th of April for moving average
 
 def datetoheader(gregorian_date):
@@ -67,8 +67,9 @@ date_list = header_list[4:]
 #print(date_list)
 index_12thofApril = date_list.index("4/12/20")
 index_13thofApril = date_list.index("4/13/20")
+index_14thofApril = date_list.index("4/14/20")
 transition_period_list = [index_12thofApril,index_13thofApril]
-transition_period_list_dates = ['4/12/20','4/13/20']
+transition_period_list_dates = ['4/12/20','4/13/20','4/14/20']
 print("Get US data from 12th of April")
 #Get Data from 12th of April and append Dataframe World
 us12april = urllib.request.urlopen(
@@ -84,7 +85,6 @@ if 'Recovered' in df_us12april.index:
     df_us12april = df_us12april.drop(index=['Recovered'])
 if 'Diamond Princess' in df_us12april.index:
     df_us12april = df_us12april.drop(index=['Diamond Princess'])
-# Check for this one
 if 'Grand Princess' in df_us12april.index:
     df_us12april = df_us12april.drop(index=['Grand Princess'])
 #print(df_us12april)
@@ -142,15 +142,14 @@ for date in date_list[index_12thofApril:]:
         df_us_daily = df_us_daily.drop(index=['Recovered'])
     if 'Diamond Princess' in df_us_daily.index:
         df_us_daily = df_us_daily.drop(index=['Diamond Princess'])
-    #Check for this one in df_world
     if 'Grand Princess' in df_us_daily.index:
         df_us_daily = df_us_daily.drop(index = ['Grand Princess'])
     #print(df_us_daily)
-    #I have state-wide data from the 12th of April -> I can have a threeday-average from the 13th of April.
-    #I need threeday-average of US until 12th of April -> I need raw data from US until 13th of April.
+    #I have state-wide data from the 12th of April -> I can have a threeday-average from the 13th of April. --> And "new data with a ratio value from the 14th of April"
+    #I need threeday-average of US until 13th of April -> I need raw data from US until 14th of April.
     #Set United States in df_world to zero
     column_number_date = df_world_columns_list.index(date)
-    if date in transition_period_list:
+    if date in transition_period_list_dates:
         print("Transition phase, let's keep all the data yay")
     else:
         united_states_index = df_world_country_list.index('US')
@@ -160,7 +159,6 @@ for date in date_list[index_12thofApril:]:
         index_number_state = df_world_province_list.index(state)
         df_world.iat[index_number_state, column_number_date] = df_us_daily.at[state,'Confirmed']
 
-#print(df_world)
 print("All data on board, let's continue")
 # Have a country list
 country_list_original = df_world['Country'].tolist()
@@ -264,7 +262,8 @@ for day in date_list_adjusted:
         confirmed_cases_three_day_average = statistics.mean(confirmed_cases_days_0_1_2)
         df_world_threedayaverage.at[location, day1_header] = confirmed_cases_three_day_average
 
-df_world_threedayaverage.at['US','4/13/20']=0
+df_world_threedayaverage.at['US','4/14/20']=0
+df_world_threedayaverage.at['US','4/15/20']=0
 for state in state_list:
     df_world_threedayaverage.at[state,'4/12/20']=0
     df_world_threedayaverage.at[state, '4/11/20'] = 0
@@ -316,8 +315,24 @@ for day in date_list_adjusted[1:]:
               #"new cases yesterday: ", new_cases_yesterday, "new cases ratio: ", new_cases_ratio)
         df_world_change_cases.at[location, day] = new_cases_ratio
 
+average_state_case_13th_of_April = df_world_threedayaverage.at['US','4/13/20']/50
+#Value for yesterday (12th of April, average per state)
+new_cases_per_average_state_13th_of_April = df_world_new_cases.at['US','4/13/20']/50
+print("per state average = ", new_cases_per_average_state_13th_of_April)
+
+for state in state_list:
+    new_cases_state_14th_of_April = df_world_new_cases.at[state,'4/14/20']
+    new_cases_state_15th_of_April = df_world_new_cases.at[state, '4/15/20']
+    new_cases_ratio_14 = new_cases_state_14th_of_April/new_cases_per_average_state_13th_of_April
+    df_world_change_cases.at[state, '4/14/20'] = new_cases_ratio_14
+    print (state, new_cases_per_average_state_13th_of_April, new_cases_state_14th_of_April, new_cases_state_15th_of_April, 'rates: ',
+           new_cases_ratio_14, df_world_change_cases.at[state,'4/15/20'])
+
 #print(df_world_change_cases)
 print("Datframe for new cases ratio was created")
+
+for state in state_list:
+    df_world_threedayaverage.at[state, '4/13/20'] = 0
 
 def corona_map_single_plot(date_map):
     date_map_index = date_list_adjusted.index(date_map)
@@ -338,26 +353,30 @@ def corona_map_single_plot(date_map):
     ax.stock_img()
     ax.set_title("Confirmed Cases of Corona Patients on {} and trend per country or province".format(date_map))
 
+
+
     for location in country_and_province:
         confirmed_cases_value = df_world_threedayaverage.at[location, date_map]
         new_cases = df_world_new_cases.at[location, date_map]
         relative_new_cases = df_world_change_cases.at[location, date_map]
+
         if confirmed_cases_value > 1:
             marker_color = 'white'
             marker_size =2
-            marker_color = 'greenyellow'
-            if relative_new_cases > 0.33:
-                marker_color = 'yellow'
-                if relative_new_cases > 0.67:
-                    marker_color = 'orange'
-                    if relative_new_cases > 1:
-                        marker_color = 'darkorange'
-                        if relative_new_cases > 1.33:
-                            marker_color = 'orangered'
-                            if relative_new_cases > 1.67:
-                                marker_color = 'red'
-                                if relative_new_cases > 2:
-                                    marker_color = 'firebrick'
+            if relative_new_cases > 0:
+                marker_color = 'greenyellow'
+                if relative_new_cases > 0.33:
+                    marker_color = 'yellow'
+                    if relative_new_cases > 0.67:
+                        marker_color = 'orange'
+                        if relative_new_cases > 1:
+                            marker_color = 'darkorange'
+                            if relative_new_cases > 1.33:
+                                marker_color = 'orangered'
+                                if relative_new_cases > 1.67:
+                                    marker_color = 'red'
+                                    if relative_new_cases > 2:
+                                        marker_color = 'firebrick'
             if new_cases == 0:
                 marker_color = 'limegreen'
                 zero_infections_streak = 0
@@ -376,9 +395,9 @@ def corona_map_single_plot(date_map):
             plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
                      color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
 
-    plt.show(block=False)
-    plt.pause(0.5)
-    plt.close()
+    #plt.show(block=False)
+    #plt.pause(0.5)
+    #plt.close()
     plt.show()
 # I need to create subplots instead of plots
 #for date_now in date_list_adjusted:
@@ -505,12 +524,12 @@ def corona_map(date_map):
 #for date in date_list_adjusted:
     #corona_map(date)
 
-for date in date_list_adjusted:
-    corona_map_single_plot(date)
-#corona_map('4/10/20')
-#corona_map('4/11/20')
-#corona_map('4/12/20')
-#corona_map('4/13/20')
-#corona_map('4/14/20')
-#corona_map('4/15/20')
+#for date in date_list_adjusted:
+    #corona_map_single_plot(date)
+corona_map_single_plot('4/10/20')
+corona_map_single_plot('4/11/20')
+corona_map_single_plot('4/12/20')
+corona_map_single_plot('4/13/20')
+corona_map_single_plot('4/14/20')
+corona_map_single_plot('4/15/20')
 
