@@ -54,7 +54,7 @@ print("Got Worldwide data")
 df_world = pd.read_csv(inputdata, sep=",")
 df_world.rename(columns={'Province/State': 'Province', 'Country/Region': 'Country'}, inplace=True)
 
-print(df_world)
+#print(df_world)
 print("Worldwide data was put into dataframe")
 
 # Create a list of all dates
@@ -188,32 +188,33 @@ country_and_province = np.unique(country_and_province_appended)
 # Count the number of rows
 total_rows = len(df_world.index)
 total_rows_list = range(0, total_rows)
-print(total_rows)
+#print(total_rows)
 
-print("All days All countries and regions")
+#print("All days All countries and regions")
 
 # Loop over all columns (days)
-for day in date_list:
-    print("This is the day " + day)
+#for day in date_list:
+    #print("This is the day " + day)
     # Loop over all rows (Countries and Provinces)
-    for row in total_rows_list:
-        province = df_world.at[row, 'Province']
-        if pd.isna(province):
-            location = df_world.at[row, 'Country']
-        else:
-            location = df_world.at[row, 'Province']
-        confirmed_cases = df_world.at[row, day]
-        print(location, confirmed_cases)
+    #for row in total_rows_list:
+        #province = df_world.at[row, 'Province']
+        #if pd.isna(province):
+            #location = df_world.at[row, 'Country']
+        #else:
+            #location = df_world.at[row, 'Province']
+        #confirmed_cases = df_world.at[row, day]
+        #print(location, confirmed_cases)
 
 # Adjust date-list: remove first and last day to enable three day moving average
 date_list_adjusted = date_list[1:-1]
-print(date_list_adjusted)
+#print(date_list_adjusted)
 
 # Make new Dataframe with three day moving averages
+print("Create new Dataframe for three day moving averages")
 header_list_threedayaverage = ["Lat", "Lon"] + date_list_adjusted
-print(header_list_threedayaverage)
+#print(header_list_threedayaverage)
 df_world_threedayaverage = pd.DataFrame(index=country_and_province, columns=header_list_threedayaverage)
-print(df_world_threedayaverage)
+#print(df_world_threedayaverage)
 
 # fill lat and lon
 for row in total_rows_list:
@@ -224,25 +225,25 @@ for row in total_rows_list:
         location = df_world.at[row, 'Country']
     else:
         location = df_world.at[row, 'Province']
-    print(location, lat, lon)
+    #print(location, lat, lon)
     df_world_threedayaverage.at[location, 'Lat'] = lat
     df_world_threedayaverage.at[location, 'Lon'] = lon
 
-print(df_world_threedayaverage)
+#print(df_world_threedayaverage)
 
 for day in date_list_adjusted:
     date_fractions = day.split('/')
     month = date_fractions[0]
     day_of_month = date_fractions[1]
     year = "20" + date_fractions[2]
-    print("day = " + day, "year = " + year, "month = " + month, "day_of_the_month = " + day_of_month)
+    #print("day = " + day, "year = " + year, "month = " + month, "day_of_the_month = " + day_of_month)
     day1 = datetime.date(int(year), int(month), int(day_of_month))
     day0 = day1 - datetime.timedelta(days=1)
     day2 = day1 + datetime.timedelta(days=1)
-    print(day0)
-    print(day1)
-    print(day2)
-    print("This is the day " + day)
+    #print(day0)
+    #print(day1)
+    #print(day2)
+    #print("This is the day " + day)
     # Loop over all rows (Countries and Provinces)
     for row in total_rows_list:
         location = df_world.at[row, 'Province']
@@ -258,7 +259,7 @@ for day in date_list_adjusted:
         confirmed_cases_day2 = df_world.at[row, day2_header]
 
         confirmed_cases_days_0_1_2 = [confirmed_cases_day0, confirmed_cases_day1, confirmed_cases_day2]
-        print(location, confirmed_cases_days_0_1_2)
+        #print(location, confirmed_cases_days_0_1_2)
 
         confirmed_cases_three_day_average = statistics.mean(confirmed_cases_days_0_1_2)
         df_world_threedayaverage.at[location, day1_header] = confirmed_cases_three_day_average
@@ -267,11 +268,12 @@ df_world_threedayaverage.at['US','4/13/20']=0
 for state in state_list:
     df_world_threedayaverage.at[state,'4/12/20']=0
     df_world_threedayaverage.at[state, '4/11/20'] = 0
-print(df_world_threedayaverage)
-
+#print(df_world_threedayaverage)
+print("Three day moving average dataframe is created")
+print("Make a dataframe to see newly infedcted each day (depending on three day average)")
 #Make a new dataframe to see newly infected (depending on three day average)
 df_world_new_cases = pd.DataFrame(index=country_and_province, columns=date_list_adjusted)
-print(df_world_new_cases)
+#print(df_world_new_cases)
 
 #Fill df_world_new_cases
 # For the first day
@@ -279,14 +281,15 @@ for location in country_and_province:
     df_world_new_cases.at[location, '1/23/20'] = df_world_threedayaverage.at[location, '1/23/20']
 #Loop for all following days
 for day in date_list_adjusted[1:]:
-    print(day)
+    #print(day)
     column_number_day = date_list_adjusted.index(day)
     day_yesterday = date_list_adjusted[column_number_day - 1]
     for location in country_and_province:
         df_world_new_cases.at[location , day] = df_world_threedayaverage.at[location,day] - df_world_threedayaverage.at[location, day_yesterday]
 
-print(df_world_new_cases)
-
+#print(df_world_new_cases)
+print("Newly infected dataframe was created")
+print("Make dataframe to calculate realtive new cases")
 # Make new dataframe to calculate relative new infected cases
 df_world_change_cases = pd.DataFrame(index=country_and_province, columns=date_list_adjusted)
 value_for_change_from_zero_to_something = 999
@@ -297,7 +300,7 @@ for location in country_and_province:
     else:
         df_world_change_cases.at[location, '1/23/20'] = 0
 for day in date_list_adjusted[1:]:
-    print(day)
+    #print(day)
     column_number_day = date_list_adjusted.index(day)
     day_yesterday = date_list_adjusted[column_number_day - 1]
     for location in country_and_province:
@@ -309,12 +312,12 @@ for day in date_list_adjusted[1:]:
                 new_cases_ratio = 0
         else:
             new_cases_ratio = new_cases_today/new_cases_yesterday
-        print("location: ", location, "today: ", day , "yesterday: ", day_yesterday, "new cases today: ", new_cases_today,
-              "new cases yesterday: ", new_cases_yesterday, "new cases ratio: ", new_cases_ratio)
+        #print("location: ", location, "today: ", day , "yesterday: ", day_yesterday, "new cases today: ", new_cases_today,
+              #"new cases yesterday: ", new_cases_yesterday, "new cases ratio: ", new_cases_ratio)
         df_world_change_cases.at[location, day] = new_cases_ratio
 
-print(df_world_change_cases)
-
+#print(df_world_change_cases)
+print("Datframe for new cases ratio was created")
 
 def corona_map_single_plot(date_map):
     date_map_index = date_list_adjusted.index(date_map)
@@ -334,6 +337,32 @@ def corona_map_single_plot(date_map):
     ax.set_global()
     ax.stock_img()
     ax.set_title("Confirmed Cases of Corona Patients on {} and trend per country or province".format(date_map))
+
+    for location in country_and_province:
+        confirmed_cases_value = df_world_threedayaverage.at[location, date_map]
+        new_cases = df_world_new_cases.at[location, date_map]
+        new_change_cases = df_world_change_cases.at[location, date_map]
+        if confirmed_cases_value > 1:
+            marker_color = 'white'
+            marker_size =2
+            if new_cases == 0:
+                marker_color = 'limegreen'
+                zero_infections_streak = 0
+                for date_counter in date_list_adjusted[:date_tomorrow_index]:
+                    newly_infected = df_world_new_cases.at[location,date_counter]
+                    if newly_infected == 0:
+                        zero_infections_streak = zero_infections_streak + 1
+                    else:
+                        zero_infections_streak = 0
+                if zero_infections_streak >= 14:
+                    marker_color = "green"
+                plt.text(df_world_threedayaverage.at[location,'Lon'], df_world_threedayaverage.at[location,'Lat'],
+                         zero_infections_streak, transform = ccrs.PlateCarree())
+
+
+            plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
+                     color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
+
     plt.show(block=False)
     plt.pause(0.5)
     plt.close()
@@ -460,8 +489,8 @@ def corona_map(date_map):
     plt.close()
     plt.show()
 
-for date in date_list_adjusted:
-    corona_map(date)
+#for date in date_list_adjusted:
+    #corona_map(date)
 
 for date in date_list_adjusted:
     corona_map_single_plot(date)
