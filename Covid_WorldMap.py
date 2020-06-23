@@ -341,10 +341,23 @@ def corona_map_single_plot(date_map):
     for location in country_and_province:
         confirmed_cases_value = df_world_threedayaverage.at[location, date_map]
         new_cases = df_world_new_cases.at[location, date_map]
-        new_change_cases = df_world_change_cases.at[location, date_map]
+        relative_new_cases = df_world_change_cases.at[location, date_map]
         if confirmed_cases_value > 1:
             marker_color = 'white'
             marker_size =2
+            marker_color = 'greenyellow'
+            if relative_new_cases > 0.33:
+                marker_color = 'yellow'
+                if relative_new_cases > 0.67:
+                    marker_color = 'orange'
+                    if relative_new_cases > 1:
+                        marker_color = 'darkorange'
+                        if relative_new_cases > 1.33:
+                            marker_color = 'orangered'
+                            if relative_new_cases > 1.67:
+                                marker_color = 'red'
+                                if relative_new_cases > 2:
+                                    marker_color = 'firebrick'
             if new_cases == 0:
                 marker_color = 'limegreen'
                 zero_infections_streak = 0
