@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.image as mpimg
 import matplotlib.colors as colors
+import matplotlib.animation as animation
 from matplotlib.colors import ListedColormap
 import numpy as np
 import numpy.ma as ma
@@ -325,8 +326,8 @@ for state in state_list:
     new_cases_state_15th_of_April = df_world_new_cases.at[state, '4/15/20']
     new_cases_ratio_14 = new_cases_state_14th_of_April/new_cases_per_average_state_13th_of_April
     df_world_change_cases.at[state, '4/14/20'] = new_cases_ratio_14
-    print (state, new_cases_per_average_state_13th_of_April, new_cases_state_14th_of_April, new_cases_state_15th_of_April, 'rates: ',
-           new_cases_ratio_14, df_world_change_cases.at[state,'4/15/20'])
+    #print (state, new_cases_per_average_state_13th_of_April, new_cases_state_14th_of_April, new_cases_state_15th_of_April, 'rates: ',
+           #new_cases_ratio_14, df_world_change_cases.at[state,'4/15/20'])
 
 #print(df_world_change_cases)
 print("Datframe for new cases ratio was created")
@@ -334,7 +335,10 @@ print("Datframe for new cases ratio was created")
 for state in state_list:
     df_world_threedayaverage.at[state, '4/13/20'] = 0
 
-def corona_map_single_plot(date_map):
+corona_maps_list = []
+
+#def corona_map_single_plot(date_map):
+for date_map in date_list_adjusted:
     date_map_index = date_list_adjusted.index(date_map)
     date_tomorrow_index = date_map_index + 1
     lat = df_world_threedayaverage['Lat']
@@ -352,7 +356,6 @@ def corona_map_single_plot(date_map):
     ax.set_global()
     ax.stock_img()
     ax.set_title("Confirmed Cases of Corona Patients on {} and trend per country or province".format(date_map))
-
 
 
     for location in country_and_province:
@@ -388,8 +391,8 @@ def corona_map_single_plot(date_map):
                         zero_infections_streak = 0
                 if zero_infections_streak >= 14:
                     marker_color = "green"
-                plt.text(df_world_threedayaverage.at[location,'Lon'], df_world_threedayaverage.at[location,'Lat'],
-                         zero_infections_streak, transform = ccrs.PlateCarree())
+                #plt.text(df_world_threedayaverage.at[location,'Lon'], df_world_threedayaverage.at[location,'Lat'],
+                         #zero_infections_streak, transform = ccrs.PlateCarree())
 
 
             plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
@@ -398,60 +401,18 @@ def corona_map_single_plot(date_map):
     #plt.show(block=False)
     #plt.pause(0.5)
     #plt.close()
-    plt.show()
-# I need to create subplots instead of plots
-#for date_now in date_list_adjusted:
-    #date_now_index = date_list_adjusted.index(date_now)
-    #date_tomorrow_index = date_now_index + 1
-    #map_name = "map_" + date_now
-    #fig = plt.figure(num=map_name, figsize=[12.8, 8])
-    #ax = plt.axes(projection=ccrs.PlateCarree())
-    #ax.set_global()
-    #ax.add_feature(cfeature.LAND)
-    #ax.add_feature(cfeature.OCEAN)
-    #ax.add_feature(cfeature.COASTLINE)
-    #ax.add_feature(cfeature.BORDERS, linestyle=":")
-    #ax.set_title("Confirmed Cases of Corona Patients on {} and trend per country or province".format(date_now))
 
-    #for location in country_and_province:
-        #confirmed_cases_value = df_world_threedayaverage.at[location, date_now]
-        #new_cases = df_world_new_cases.at[location, date_now]
-        #new_cases_ratio = new_cases/confirmed_cases_value
-        #new_change_cases = df_world_change_cases.at[location, date_now]
-        #if confirmed_cases_value > 0:
-            #marker_color = 'white'
-            #marker_color = 'orange'
-            #marker_size = math.log(confirmed_cases_value)
-            #if marker_size < 1:
-                #marker_size = 1
-            #See changes in confirmed cases:
-            #if new_change_cases < 0.9:
-                #marker_color = 'yellow'
-            #if new_change_cases > 1.1:
-                #marker_color = 'red'
-            #if new_cases == 0:
-                #marker_color = 'greenyellow'
-                #zero_infections_streak = 0
-                #print("We have 0 new cases on {} in {}!".format(date_now,location))
-                #for date_counter in date_list_adjusted[:date_tomorrow_index]:
-                    #newly_infected = df_world_new_cases.at[location,date_counter]
-                    #if newly_infected == 0:
-                        #zero_infections_streak = zero_infections_streak + 1
-                    #else:
-                        #zero_infections_streak = 0
-                #if zero_infections_streak >= 14:
-                    #marker_color = "green"
-            #plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
-                     #color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
-    #subplot_row_number = (np.argwhere(date_list_adjusted == date_now))
-    #plt.title(date_now)
-    #print(date_now + " plot was created")
-    #plt.show(block = False)
-    #plt.pause(0.5)
-    #plt.close()
+    #plt.savefig("/Users/evaammann/Desktop/Corona_Maps/CoronaMap_{}".format(date_map_index),dpi=300)
+    plt.savefig("CoronaMap_{}".format(date_map_index), dpi=100)
+    print("Image Saved for {}".format(date_map))
+    corona_maps_list.append("CoronaMap_{}.png".format(date_map_index))
+    #plt.show()
 
-    # plt.text(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
-    # 'yay' , horizontalalignment='right', transform=ccrs.PlateCarree())
+print(corona_maps_list)
+print("Start the Animation")
+#fig_anim = plt.figure(num="Corona Map", figsize=(12.8, 8))
+anim = animation.ArtistAnimation(fig=fig, artists=corona_maps_list)
+plt.show()
 
 def corona_map(date_map):
     lat = df_world_threedayaverage['Lat']
@@ -526,10 +487,13 @@ def corona_map(date_map):
 
 #for date in date_list_adjusted:
     #corona_map_single_plot(date)
-corona_map_single_plot('4/10/20')
-corona_map_single_plot('4/11/20')
-corona_map_single_plot('4/12/20')
-corona_map_single_plot('4/13/20')
-corona_map_single_plot('4/14/20')
-corona_map_single_plot('4/15/20')
+#corona_map_single_plot('4/10/20')
+#corona_map_single_plot('4/11/20')
+#corona_map_single_plot('4/12/20')
+#corona_map_single_plot('4/13/20')
+#corona_map_single_plot('4/14/20')
+#corona_map_single_plot('4/15/20')
+
+
+
 
