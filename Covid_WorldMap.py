@@ -21,6 +21,7 @@ from datetime import date
 import urllib.request
 from matplotlib.widgets import Slider, Button, RadioButtons
 import cartopy.feature as cfeature
+import cv2
 import imageio
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 #Find a solution for 11/12th of April for moving average
@@ -336,9 +337,19 @@ for state in state_list:
     df_world_threedayaverage.at[state, '4/13/20'] = 0
 
 corona_maps_list = []
+fig = plt.figure(num="Corona Map", figsize=(12.8, 8))
+ax = plt.axes(projection=ccrs.PlateCarree())
+ax.add_feature(cfeature.LAND)
+ax.add_feature(cfeature.OCEAN)
+ax.add_feature(cfeature.COASTLINE)
+ax.add_feature(cfeature.BORDERS, linestyle=':')
+ax.coastlines()
+ax.set_global()
+ax.stock_img()
 
+date_list_test = ('4/10/20','4/11/20','4/12/20','4/13/20','4/14/20','4/15/20')
 #def corona_map_single_plot(date_map):
-for date_map in date_list_adjusted:
+for date_map in date_list_test:
     date_map_index = date_list_adjusted.index(date_map)
     date_tomorrow_index = date_map_index + 1
     lat = df_world_threedayaverage['Lat']
@@ -346,15 +357,7 @@ for date_map in date_list_adjusted:
     threedayaverage_map = df_world_threedayaverage[date_map]
     newly_infected_map = df_world_new_cases[date_map]
     new_infection_rate_map = df_world_change_cases[date_map]
-    fig = plt.figure(num="Corona Map", figsize=(12.8, 8))
-    ax = plt.axes(projection=ccrs.PlateCarree())
-    ax.add_feature(cfeature.LAND)
-    ax.add_feature(cfeature.OCEAN)
-    ax.add_feature(cfeature.COASTLINE)
-    ax.add_feature(cfeature.BORDERS, linestyle=':')
-    ax.coastlines()
-    ax.set_global()
-    ax.stock_img()
+
     ax.set_title("Confirmed Cases of Corona Patients on {} and trend per country or province".format(date_map))
 
 
@@ -405,13 +408,15 @@ for date_map in date_list_adjusted:
     #plt.savefig("/Users/evaammann/Desktop/Corona_Maps/CoronaMap_{}".format(date_map_index),dpi=300)
     plt.savefig("CoronaMap_{}".format(date_map_index), dpi=100)
     print("Image Saved for {}".format(date_map))
-    corona_maps_list.append("CoronaMap_{}.png".format(date_map_index))
+    corona_map_png = mpimg.imread("CoronaMap_{}.png".format(date_map_index))
+    corona_map_imshow = plt.imshow(corona_map_png, animated = True)
+    corona_maps_list.append(corona_map_imshow)
     #plt.show()
+
 
 print(corona_maps_list)
 print("Start the Animation")
-#fig_anim = plt.figure(num="Corona Map", figsize=(12.8, 8))
-anim = animation.ArtistAnimation(fig=fig, artists=corona_maps_list)
+anim = animation.ArtistAnimation(fig=fig, artists=corona_maps_list,interval=50, repeat_delay=1000)
 plt.show()
 
 def corona_map(date_map):
