@@ -20,6 +20,8 @@ import osgeo
 import cartopy.crs as ccrs
 from datetime import date
 import urllib.request
+
+from matplotlib.lines import Line2D
 from matplotlib.widgets import Slider, Button, RadioButtons
 import cartopy.feature as cfeature
 #import ffmpeg
@@ -355,7 +357,7 @@ for date_map in date_list_test:
     newly_infected_map = df_world_new_cases[date_map]
     new_infection_rate_map = df_world_change_cases[date_map]
 
-    fig = plt.figure(num="Corona Map", figsize=(12.8, 8))
+    fig = plt.figure(num="Corona Map", figsize=(12.8, 6))
 
     ax = plt.axes(projection=ccrs.PlateCarree())
     ax.add_feature(cfeature.LAND)
@@ -411,7 +413,11 @@ for date_map in date_list_test:
 
     #colourbar = mcb.ColorbarBase(ax=ax, cmap=cmap, boundaries=bounds)
     #colourbar.set_label('Infection Rate')
-    fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax, extend = 'max', extendfrac='auto')
+    fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax, extend = 'max', extendfrac='auto', shrink=0.7, aspect=12, pad=0.025,
+                 label='Infection Rate compared to day before')
+    line1 = Line2D(range(1), range(1), color="white", marker='o', markerfacecolor="limegreen")
+    line2 = Line2D(range(1), range(1), color="white", marker='o', markerfacecolor="green")
+    plt.legend((line1, line2), ('No new infections', 'No new infections for 14 days'), numpoints=1, loc=1)
 
     #plt.savefig("/Users/evaammann/Desktop/Corona_Maps/CoronaMap_{}".format(date_map_index),dpi=300)
     #plt.savefig("CoronaMap_{}".format(date_map_index), dpi=100)
@@ -419,11 +425,12 @@ for date_map in date_list_test:
     #corona_map_png = mpimg.imread("CoronaMap_{}.png".format(date_map_index))
     #corona_map_imshow = plt.imshow(corona_map_png, animated = True)
     #corona_maps_list.append([corona_map_imshow])
-    #plt.show()
+    plt.tight_layout(pad=1.08)
+    plt.show()
 
-    plt.show(block=False)
-    plt.pause(0.5)
-    plt.close()
+    #plt.show(block=False)
+    #plt.pause(0.5)
+    #plt.close()
 
 
 #print(corona_maps_list)
@@ -496,7 +503,7 @@ def corona_map(date_map):
                         #marker_color = "green"
                 plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
                          color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree(), zorder =5)
-
+    plt.tight_layout(pad=1.08)
     plt.axis(aspect='equal')
     plt.xlabel('longitude')
     plt.ylabel('latitude')
