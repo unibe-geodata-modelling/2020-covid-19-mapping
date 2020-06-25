@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.image as mpimg
 import matplotlib.colors as colors
+import matplotlib.colorbar as mcb
 import matplotlib.animation as animation
 from matplotlib.colors import ListedColormap
 import numpy as np
@@ -21,7 +22,7 @@ from datetime import date
 import urllib.request
 from matplotlib.widgets import Slider, Button, RadioButtons
 import cartopy.feature as cfeature
-import cv2
+#import ffmpeg
 import imageio
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 #Find a solution for 11/12th of April for moving average
@@ -337,15 +338,11 @@ for state in state_list:
     df_world_threedayaverage.at[state, '4/13/20'] = 0
 
 corona_maps_list = []
-fig = plt.figure(num="Corona Map", figsize=(12.8, 8))
-ax = plt.axes(projection=ccrs.PlateCarree())
-ax.add_feature(cfeature.LAND)
-ax.add_feature(cfeature.OCEAN)
-ax.add_feature(cfeature.COASTLINE)
-ax.add_feature(cfeature.BORDERS, linestyle=':')
-ax.coastlines()
-ax.set_global()
-ax.stock_img()
+
+bounds = (0,0.33,0.67,1,1.33,1.67,2)
+cmap = colors.ListedColormap(['greenyellow','yellow','orange','darkorange', 'orangered','red'])
+norm = colors.BoundaryNorm(bounds, cmap.N)
+cmap.set_over('firebrick')
 
 date_list_test = ('4/10/20','4/11/20','4/12/20','4/13/20','4/14/20','4/15/20')
 #def corona_map_single_plot(date_map):
@@ -357,6 +354,17 @@ for date_map in date_list_test:
     threedayaverage_map = df_world_threedayaverage[date_map]
     newly_infected_map = df_world_new_cases[date_map]
     new_infection_rate_map = df_world_change_cases[date_map]
+
+    fig = plt.figure(num="Corona Map", figsize=(12.8, 8))
+
+    ax = plt.axes(projection=ccrs.PlateCarree())
+    ax.add_feature(cfeature.LAND)
+    ax.add_feature(cfeature.OCEAN)
+    ax.add_feature(cfeature.COASTLINE)
+    ax.add_feature(cfeature.BORDERS, linestyle=':')
+    ax.coastlines()
+    ax.set_global()
+    ax.stock_img()
 
     ax.set_title("Confirmed Cases of Corona Patients on {} and trend per country or province".format(date_map))
 
@@ -401,23 +409,34 @@ for date_map in date_list_test:
             plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
                      color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
 
-    #plt.show(block=False)
-    #plt.pause(0.5)
-    #plt.close()
+    #colourbar = mcb.ColorbarBase(ax=ax, cmap=cmap, boundaries=bounds)
+    #colourbar.set_label('Infection Rate')
+    fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax, extend = 'max', extendfrac='auto')
 
     #plt.savefig("/Users/evaammann/Desktop/Corona_Maps/CoronaMap_{}".format(date_map_index),dpi=300)
-    plt.savefig("CoronaMap_{}".format(date_map_index), dpi=100)
-    print("Image Saved for {}".format(date_map))
-    corona_map_png = mpimg.imread("CoronaMap_{}.png".format(date_map_index))
-    corona_map_imshow = plt.imshow(corona_map_png, animated = True)
-    corona_maps_list.append(corona_map_imshow)
+    #plt.savefig("CoronaMap_{}".format(date_map_index), dpi=100)
+    #print("Image Saved for {}".format(date_map))
+    #corona_map_png = mpimg.imread("CoronaMap_{}.png".format(date_map_index))
+    #corona_map_imshow = plt.imshow(corona_map_png, animated = True)
+    #corona_maps_list.append([corona_map_imshow])
     #plt.show()
 
+    plt.show(block=False)
+    plt.pause(0.5)
+    plt.close()
 
-print(corona_maps_list)
-print("Start the Animation")
-anim = animation.ArtistAnimation(fig=fig, artists=corona_maps_list,interval=50, repeat_delay=1000)
-plt.show()
+
+#print(corona_maps_list)
+#print("Start the Animation")
+#FFWriter = animation.FFMpegWriter(fps=20)
+
+#Writer = animation.writers['ffmpeg']
+#writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+#fig_anim = plt.figure(num="Corona Map", figsize=(12.8, 8))
+#anim = animation.ArtistAnimation(fig=fig_anim, artists=corona_maps_list)
+#plt.show()
+#anim.save('Corona Map Video.mp4',writer=writer)
+
 
 def corona_map(date_map):
     lat = df_world_threedayaverage['Lat']
