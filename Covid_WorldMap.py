@@ -49,7 +49,7 @@ def datetoheader(gregorian_date):
 
 
 # Get Data locally (2nd of April 2020)
-# inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/PyCharmProjects/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+#inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/PyCharmProjects/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 print("Get Worldwide data")
 # Get Data from John Hopkins GitHub Repository --> RAW very important
 inputdata = urllib.request.urlopen(
