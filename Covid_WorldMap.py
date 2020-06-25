@@ -348,7 +348,7 @@ cmap.set_over('firebrick')
 
 date_list_test = ('4/10/20','4/11/20','4/12/20','4/13/20','4/14/20','4/15/20')
 #def corona_map_single_plot(date_map):
-for date_map in date_list_test:
+for date_map in date_list_adjusted:
     date_map_index = date_list_adjusted.index(date_map)
     date_tomorrow_index = date_map_index + 1
     lat = df_world_threedayaverage['Lat']
@@ -375,10 +375,12 @@ for date_map in date_list_test:
         confirmed_cases_value = df_world_threedayaverage.at[location, date_map]
         new_cases = df_world_new_cases.at[location, date_map]
         relative_new_cases = df_world_change_cases.at[location, date_map]
-
         if confirmed_cases_value > 1:
             marker_color = 'white'
-            marker_size =2
+            marker_size_log = math.log(confirmed_cases_value,10)
+            marker_size = marker_size_log*1.75
+            if relative_new_cases < 0:
+                print(date_map," ",location, " ",relative_new_cases)
             if relative_new_cases > 0:
                 marker_color = 'greenyellow'
                 if relative_new_cases > 0.33:
@@ -393,6 +395,7 @@ for date_map in date_list_test:
                                     marker_color = 'red'
                                     if relative_new_cases > 2:
                                         marker_color = 'firebrick'
+
             if new_cases == 0:
                 marker_color = 'limegreen'
                 zero_infections_streak = 0
@@ -413,11 +416,18 @@ for date_map in date_list_test:
 
     #colourbar = mcb.ColorbarBase(ax=ax, cmap=cmap, boundaries=bounds)
     #colourbar.set_label('Infection Rate')
-    fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax, extend = 'max', extendfrac='auto', shrink=0.7, aspect=12, pad=0.025,
+    fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax, extend = 'max', extendfrac='auto', shrink=0.7, aspect=12, pad=0.05,
                  label='Infection Rate compared to day before')
-    line1 = Line2D(range(1), range(1), color="white", marker='o', markerfacecolor="limegreen")
-    line2 = Line2D(range(1), range(1), color="white", marker='o', markerfacecolor="green")
-    plt.legend((line1, line2), ('No new infections', 'No new infections for 14 days'), numpoints=1, loc=1)
+    line1 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="limegreen")
+    line2 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
+    line3 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
+    line4 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
+    line5 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
+    line6 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
+    fig.legend((line1, line2, line3, line4, line5, line6), ('No new infections', 'No new infections for 14 days',
+                                                            '1000 infections', '10 000 infections', '100 000 infections',
+                                                            '1 000 000 infections'), numpoints=1, loc='lower right',
+               bbox_to_anchor=(1,0.1))
 
     #plt.savefig("/Users/evaammann/Desktop/Corona_Maps/CoronaMap_{}".format(date_map_index),dpi=300)
     #plt.savefig("CoronaMap_{}".format(date_map_index), dpi=100)
@@ -426,11 +436,11 @@ for date_map in date_list_test:
     #corona_map_imshow = plt.imshow(corona_map_png, animated = True)
     #corona_maps_list.append([corona_map_imshow])
     plt.tight_layout(pad=1.08)
-    plt.show()
+    #plt.show()
 
-    #plt.show(block=False)
-    #plt.pause(0.5)
-    #plt.close()
+    plt.show(block=False)
+    plt.pause(0.5)
+    plt.close()
 
 
 #print(corona_maps_list)
