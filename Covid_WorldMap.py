@@ -2,6 +2,8 @@
 
 # Information
 # Import Packages
+import matplotlib
+#matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.image as mpimg
@@ -24,10 +26,14 @@ import urllib.request
 from matplotlib.lines import Line2D
 from matplotlib.widgets import Slider, Button, RadioButtons
 import cartopy.feature as cfeature
+
 #import ffmpeg
 import imageio
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 #Find a solution for 11/12th of April for moving average
+
+#Writer = animation.writers['ffmpeg']
+#writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
 
 def datetoheader(gregorian_date):
     gregorian_date_string = str(gregorian_date)
@@ -339,6 +345,7 @@ print("Datframe for new cases ratio was created")
 for state in state_list:
     df_world_threedayaverage.at[state, '4/13/20'] = 0
 
+fig = plt.figure(num="Corona Map", figsize=(12.8, 6.5))
 corona_maps_list = []
 colors_list=['yellow','gold','darkorange','orangered', 'crimson','firebrick','darkred']
 bounds = (0,0.33,0.67,1,1.33,1.67,2)
@@ -439,15 +446,15 @@ for date_map in date_list_adjusted:
                title='Absolute numbers of confirmed infections',
                frameon=False)
 
-
-
+    plt.tight_layout(pad=1.08)
     #plt.savefig("/Users/evaammann/Desktop/Corona_Maps/CoronaMap_{}".format(date_map_index),dpi=300)
     #plt.savefig("CoronaMap_{}".format(date_map_index), dpi=100)
     #print("Image Saved for {}".format(date_map))
     #corona_map_png = mpimg.imread("CoronaMap_{}.png".format(date_map_index))
-    #corona_map_imshow = plt.imshow(corona_map_png, animated = True)
-    #corona_maps_list.append([corona_map_imshow])
-    plt.tight_layout(pad=1.08)
+    #corona_map_imshow = plt.imshow(corona_map_png)
+
+    #corona_maps_list.append(corona_map_imshow,)
+
     #plt.show()
 
     plt.show(block=False)
@@ -458,94 +465,15 @@ for date_map in date_list_adjusted:
 #print(corona_maps_list)
 #print("Start the Animation")
 #FFWriter = animation.FFMpegWriter(fps=20)
-
-#Writer = animation.writers['ffmpeg']
-#writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-#fig_anim = plt.figure(num="Corona Map", figsize=(12.8, 8))
-#anim = animation.ArtistAnimation(fig=fig_anim, artists=corona_maps_list)
+#fig_anim = plt.figure(num="Corona Map", figsize=(12.8, 6.5))
+#anim = animation.ArtistAnimation(fig=fig, artists=corona_maps_list,interval=50, repeat_delay=3000,
+                                   #blit=True)
 #plt.show()
-#anim.save('Corona Map Video.mp4',writer=writer)
 
 
-def corona_map(date_map):
-    lat = df_world_threedayaverage['Lat']
-    lon = df_world_threedayaverage['Lon']
-    threedayaverage_map = df_world_threedayaverage[date_map]
-    print(type(threedayaverage_map))
-    s_linear = threedayaverage_map.astype('float64')
-    print(type(s_linear))
-    s_log = np.log(s_linear)
-    s_square = np.square(s_log)
-    print(type(s_square))
-    masked_threedayaverage = ma.masked_equal(threedayaverage_map,0)
-    #threedayaverage_map_log = float(math.log(threedayaverage_map))
-    newly_infected_map = df_world_new_cases[date_map]
-    new_infection_rate_map = df_world_change_cases[date_map]
-    fig = plt.figure(num="Corona Map", figsize=(12.8, 8))
-    ax = plt.axes(projection=ccrs.PlateCarree())
-    ax.add_feature(cfeature.LAND)
-    ax.add_feature(cfeature.OCEAN)
-    ax.add_feature(cfeature.COASTLINE)
-    ax.add_feature(cfeature.BORDERS, linestyle=':')
-    ax.coastlines()
-    ax.set_global()
-    ax.stock_img()
-    #norming the colorbar
-    divnorm = colors.DivergingNorm(vmin = 0, vcenter = 1, vmax = 2)
-    #adding limegreen to the hot_r colormap
-    hot_r = cm.get_cmap('hot_r', 256)
-    newcolors = hot_r(np.linspace(0, 1, 256))
-    #limegreen = np.array([0, 255 / 256, 0, 1])
-    #newcolors[:5, :] = limegreen
-    #newcolors2 = newcolors[:-10]
-    #newcmp = ListedColormap(newcolors2)
+#plt.show()
+#anim.save('Corona Map Video.mp4', writer=writer)
 
-    plt.scatter(lon, lat, transform=ccrs.PlateCarree(),
-        label=None, s= s_square, c=new_infection_rate_map, cmap='YlOrRd',norm = divnorm,linewidth=0,zorder=3)
-    #if 0 new cases make limegreen:
-    for location in country_and_province:
-        confirmed_cases_three_day_average = df_world_threedayaverage.at[location,date_map]
-        new_cases_today = df_world_new_cases.at[location,date_map]
-        if confirmed_cases_three_day_average > 0:
-            if new_cases_today == 0:
-                marker_size = math.log(confirmed_cases_three_day_average)
-                marker_color = 'greenyellow'
-                zero_infections_streak = 0
-                print("We have 0 new cases on {} in {}!".format(date_map,location))
-                date_now_index = date_list_adjusted.index(date_map)
-                date_tomorrow_index = date_now_index + 1
-                # if 14 days no new cases make dark green:
-                #for date_counter in date_list_adjusted[:date_tomorrow_index]:
-                    #newly_infected = df_world_new_cases.at[location,date_counter]
-                    #if newly_infected == 0:
-                        #zero_infections_streak = zero_infections_streak + 1
-                    #else:
-                        #zero_infections_streak = 0
-                    #if zero_infections_streak >= 14:
-                        #marker_color = "green"
-                plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
-                         color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree(), zorder =5)
-    plt.tight_layout(pad=1.08)
-    plt.axis(aspect='equal')
-    plt.xlabel('longitude')
-    plt.ylabel('latitude')
-    plt.colorbar(label='Relative new Corona Cases on {}'.format(date_map))
-    plt.show(block = False)
-    plt.pause(0.5)
-    plt.close()
-    plt.show()
-
-#for date in date_list_adjusted:
-    #corona_map(date)
-
-#for date in date_list_adjusted:
-    #corona_map_single_plot(date)
-#corona_map_single_plot('4/10/20')
-#corona_map_single_plot('4/11/20')
-#corona_map_single_plot('4/12/20')
-#corona_map_single_plot('4/13/20')
-#corona_map_single_plot('4/14/20')
-#corona_map_single_plot('4/15/20')
 
 
 
