@@ -357,7 +357,7 @@ for date_map in date_list_adjusted:
     newly_infected_map = df_world_new_cases[date_map]
     new_infection_rate_map = df_world_change_cases[date_map]
 
-    fig = plt.figure(num="Corona Map", figsize=(12.8, 6))
+    fig = plt.figure(num="Corona Map", figsize=(12.8, 7))
 
     ax = plt.axes(projection=ccrs.PlateCarree())
     ax.add_feature(cfeature.LAND)
@@ -416,18 +416,18 @@ for date_map in date_list_adjusted:
 
     #colourbar = mcb.ColorbarBase(ax=ax, cmap=cmap, boundaries=bounds)
     #colourbar.set_label('Infection Rate')
-    fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax, extend = 'max', extendfrac='auto', shrink=0.7, aspect=12, pad=0.05,
+    fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, extend = 'max', extendfrac='auto', shrink=0.7, aspect=12, pad=0.05,
                  label='Infection Rate compared to day before')
     line1 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="limegreen")
     line2 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
-    line3 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
-    line4 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
-    line5 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
-    line6 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
+    line3 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white", markeredgecolor="black",markersize= (math.log(1000,10))*1.75)
+    line4 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",markeredgecolor="black",markersize= (math.log(10000,10))*1.75)
+    line5 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",markeredgecolor="black",markersize= (math.log(100000,10))*1.75)
+    line6 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",markeredgecolor="black",markersize= (math.log(1000000,10))*1.75)
     fig.legend((line1, line2, line3, line4, line5, line6), ('No new infections', 'No new infections for 14 days',
                                                             '1000 infections', '10 000 infections', '100 000 infections',
-                                                            '1 000 000 infections'), numpoints=1, loc='lower right',
-               bbox_to_anchor=(1,0.1))
+                                                            '1 000 000 infections'), numpoints=1, ncol=3,
+               loc='lower center')
 
     #plt.savefig("/Users/evaammann/Desktop/Corona_Maps/CoronaMap_{}".format(date_map_index),dpi=300)
     #plt.savefig("CoronaMap_{}".format(date_map_index), dpi=100)
