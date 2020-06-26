@@ -340,11 +340,11 @@ for state in state_list:
     df_world_threedayaverage.at[state, '4/13/20'] = 0
 
 corona_maps_list = []
-
+colors_list=['yellow','gold','darkorange','orangered', 'crimson','firebrick','darkred']
 bounds = (0,0.33,0.67,1,1.33,1.67,2)
-cmap = colors.ListedColormap(['greenyellow','yellow','orange','darkorange', 'orangered','red'])
+cmap = colors.ListedColormap(colors_list[0:6])
 norm = colors.BoundaryNorm(bounds, cmap.N)
-cmap.set_over('firebrick')
+cmap.set_over(colors_list[6])
 
 date_list_test = ('4/10/20','4/11/20','4/12/20','4/13/20','4/14/20','4/15/20')
 #def corona_map_single_plot(date_map):
@@ -357,7 +357,7 @@ for date_map in date_list_adjusted:
     newly_infected_map = df_world_new_cases[date_map]
     new_infection_rate_map = df_world_change_cases[date_map]
 
-    fig = plt.figure(num="Corona Map", figsize=(12.8, 7))
+    fig = plt.figure(num="Corona Map", figsize=(12.8, 6.5))
 
     ax = plt.axes(projection=ccrs.PlateCarree())
     ax.add_feature(cfeature.LAND)
@@ -368,7 +368,8 @@ for date_map in date_list_adjusted:
     ax.set_global()
     ax.stock_img()
 
-    ax.set_title("Confirmed Cases of Corona Patients on {} and trend per country or province".format(date_map))
+    ax.set_title("Confirmed Cases of Corona Patients and infection rate on {} per Country or Province".format(date_map),
+                 pad=22)
 
 
     for location in country_and_province:
@@ -379,22 +380,20 @@ for date_map in date_list_adjusted:
             marker_color = 'white'
             marker_size_log = math.log(confirmed_cases_value,10)
             marker_size = marker_size_log*1.75
-            if relative_new_cases < 0:
-                print(date_map," ",location, " ",relative_new_cases)
             if relative_new_cases > 0:
-                marker_color = 'greenyellow'
+                marker_color = colors_list[0]
                 if relative_new_cases > 0.33:
-                    marker_color = 'yellow'
+                    marker_color = colors_list[1]
                     if relative_new_cases > 0.67:
-                        marker_color = 'orange'
+                        marker_color = colors_list[2]
                         if relative_new_cases > 1:
-                            marker_color = 'darkorange'
+                            marker_color = colors_list[3]
                             if relative_new_cases > 1.33:
-                                marker_color = 'orangered'
+                                marker_color = colors_list[4]
                                 if relative_new_cases > 1.67:
-                                    marker_color = 'red'
+                                    marker_color = colors_list[5]
                                     if relative_new_cases > 2:
-                                        marker_color = 'firebrick'
+                                        marker_color = colors_list[6]
 
             if new_cases == 0:
                 marker_color = 'limegreen'
@@ -418,16 +417,29 @@ for date_map in date_list_adjusted:
     #colourbar.set_label('Infection Rate')
     fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, extend = 'max', extendfrac='auto', shrink=0.7, aspect=12, pad=0.05,
                  label='Infection Rate compared to day before')
-    line1 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="limegreen")
-    line2 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green")
-    line3 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white", markeredgecolor="black",markersize= (math.log(1000,10))*1.75)
-    line4 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",markeredgecolor="black",markersize= (math.log(10000,10))*1.75)
-    line5 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",markeredgecolor="black",markersize= (math.log(100000,10))*1.75)
-    line6 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",markeredgecolor="black",markersize= (math.log(1000000,10))*1.75)
-    fig.legend((line1, line2, line3, line4, line5, line6), ('No new infections', 'No new infections for 14 days',
-                                                            '1000 infections', '10 000 infections', '100 000 infections',
-                                                            '1 000 000 infections'), numpoints=1, ncol=3,
-               loc='lower center')
+    line1 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="limegreen",markersize= (math.log(100000,10))*1.75)
+    line2 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green",markersize= (math.log(100000,10))*1.75)
+    line3 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",
+                   markeredgecolor="black",markersize= (math.log(1000,10))*1.75)
+    line4 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",
+                   markeredgecolor="black",markersize= (math.log(10000,10))*1.75)
+    line5 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",
+                   markeredgecolor="black",markersize= (math.log(100000,10))*1.75)
+    line6 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",
+                   markeredgecolor="black",markersize= (math.log(1000000,10))*1.75)
+    line7=Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",
+                   markeredgecolor="white",markersize= 1)
+    fig.legend((line1, line2), ('No new infections', 'No new infections for 14 days'), numpoints=1, ncol=1,
+               loc='lower right',title='Infection-free locations',
+               frameon=False)
+    fig.legend((line3, line4, line5, line6), ('1000 infections', '10\'000 infections',
+                                                            '100\'000 infections',
+                                                            '1\'000\'000 infections'), numpoints=1, ncol=2,
+               loc='lower center', bbox_to_anchor=(0.4,0),
+               title='Absolute numbers of confirmed infections',
+               frameon=False)
+
+
 
     #plt.savefig("/Users/evaammann/Desktop/Corona_Maps/CoronaMap_{}".format(date_map_index),dpi=300)
     #plt.savefig("CoronaMap_{}".format(date_map_index), dpi=100)
