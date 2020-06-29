@@ -299,31 +299,37 @@ for day in date_list_adjusted[1:]:
 
 #print(df_world_new_cases)
 print("Newly infected dataframe was created")
-print("Make dataframe to calculate realtive new cases")
+print("Make dataframe to calculate relative new cases")
 # Make new dataframe to calculate relative new infected cases
 df_world_change_cases = pd.DataFrame(index=country_and_province, columns=date_list_adjusted)
 value_for_change_from_zero_to_something = 999
-
+#Special case for relative values for 23.01.2020
 for location in country_and_province:
     if df_world_threedayaverage.at[location, '1/23/20'] > 0:
         df_world_change_cases.at[location, '1/23/20'] = value_for_change_from_zero_to_something
+        df_world_change_cases.at[location,'1/24/20']=df_world_new_cases.at[location,'1/24/20']/df_world_new_cases.at[location,'1/23/20']
     else:
         df_world_change_cases.at[location, '1/23/20'] = 0
-for day in date_list_adjusted[1:]:
+        if df_world_threedayaverage.at[location,'1/24/20']>0:
+            df_world_change_cases.at[location,'1/24/20']=value_for_change_from_zero_to_something
+        else:
+            df_world_change_cases.at[location,'1/24/20']=0
+for day in date_list_adjusted[2:]:
     #print(day)
     column_number_day = date_list_adjusted.index(day)
     day_yesterday = date_list_adjusted[column_number_day - 1]
+    day_before_yesterday = date_list_adjusted[column_number_day-2]
     for location in country_and_province:
         new_cases_today = df_world_new_cases.at[location,day]
-        new_cases_yesterday = df_world_new_cases.at[location,day_yesterday]
-        if new_cases_yesterday == 0:
+        new_cases_daybeforeyesterday = df_world_new_cases.at[location,day_before_yesterday]
+        if new_cases_today == 0:
+            new_cases_ratio = 0
+        elif new_cases_daybeforeyesterday == 0:
             new_cases_ratio = value_for_change_from_zero_to_something
-            if new_cases_today == 0:
-                new_cases_ratio = 0
         else:
-            new_cases_ratio = new_cases_today/new_cases_yesterday
-        #print("location: ", location, "today: ", day , "yesterday: ", day_yesterday, "new cases today: ", new_cases_today,
-              #"new cases yesterday: ", new_cases_yesterday, "new cases ratio: ", new_cases_ratio)
+            new_cases_ratio = new_cases_today/new_cases_daybeforeyesterday
+        #print("location: ", location, "today: ", day , "day before yesterday: ", day_before_yesterday, "new cases today: ", new_cases_today,
+              #"new cases day before yesterday: ", new_cases_daybeforeyesterday, "new cases ratio: ", new_cases_ratio)
         df_world_change_cases.at[location, day] = new_cases_ratio
 
 average_state_case_13th_of_April = df_world_threedayaverage.at['US','4/13/20']/50
@@ -335,7 +341,12 @@ for state in state_list:
     new_cases_state_14th_of_April = df_world_new_cases.at[state,'4/14/20']
     new_cases_state_15th_of_April = df_world_new_cases.at[state, '4/15/20']
     new_cases_ratio_14 = new_cases_state_14th_of_April/new_cases_per_average_state_13th_of_April
+    if new_cases_state_14th_of_April == 0:
+        new_cases_ratio_15 = value_for_change_from_zero_to_something
+    else:
+        new_cases_ratio_15 = new_cases_state_15th_of_April/new_cases_state_14th_of_April
     df_world_change_cases.at[state, '4/14/20'] = new_cases_ratio_14
+    df_world_change_cases.at[state,'4/15/20'] = new_cases_ratio_15
     #print (state, new_cases_per_average_state_13th_of_April, new_cases_state_14th_of_April, new_cases_state_15th_of_April, 'rates: ',
            #new_cases_ratio_14, df_world_change_cases.at[state,'4/15/20'])
 
@@ -375,7 +386,7 @@ for date_map in date_list_adjusted:
     ax.set_global()
     ax.stock_img()
 
-    ax.set_title("Confirmed Cases of Corona Patients and infection rate on {} per Country or Province".format(date_map),
+    ax.set_title("Confirmed Cases of Corona Patients and Infection Rate on {} per Country or Province".format(date_map),
                  pad=22)
 
 
@@ -423,7 +434,7 @@ for date_map in date_list_adjusted:
     #colourbar = mcb.ColorbarBase(ax=ax, cmap=cmap, boundaries=bounds)
     #colourbar.set_label('Infection Rate')
     fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, extend = 'max', extendfrac='auto', shrink=0.7, aspect=12, pad=0.05,
-                 label='Infection Rate compared to day before')
+                 label='Infection Rate compared to day before yesterday')
     line1 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="limegreen",markersize= (math.log(100000,10))*1.75)
     line2 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green",markersize= (math.log(100000,10))*1.75)
     line3 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",
