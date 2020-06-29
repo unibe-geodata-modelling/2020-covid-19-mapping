@@ -434,7 +434,7 @@ for date_map in date_list_adjusted:
     #colourbar = mcb.ColorbarBase(ax=ax, cmap=cmap, boundaries=bounds)
     #colourbar.set_label('Infection Rate')
     fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, extend = 'max', extendfrac='auto', shrink=0.7, aspect=12, pad=0.05,
-                 label='Infection Rate compared to day before yesterday')
+                 label='Infection Rate compared to two days ago')
     line1 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="limegreen",markersize= (math.log(100000,10))*1.75)
     line2 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green",markersize= (math.log(100000,10))*1.75)
     line3 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="white",
