@@ -10,7 +10,7 @@ import matplotlib.image as mpimg
 import matplotlib.colors as colors
 import matplotlib.colorbar as mcb
 import matplotlib.animation as animation
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import numpy as np
 import numpy.ma as ma
 import pandas as pd
@@ -332,7 +332,7 @@ for day in date_list_adjusted[2:]:
               #"new cases day before yesterday: ", new_cases_daybeforeyesterday, "new cases ratio: ", new_cases_ratio)
         df_world_change_cases.at[location, day] = new_cases_ratio
 
-average_state_case_13th_of_April = df_world_threedayaverage.at['US','4/13/20']/50
+#average_state_case_13th_of_April = df_world_threedayaverage.at['US','4/13/20']/50
 #Value for yesterday (12th of April, average per state)
 new_cases_per_average_state_13th_of_April = df_world_new_cases.at['US','4/13/20']/50
 print("per state average = ", new_cases_per_average_state_13th_of_April)
@@ -358,11 +358,13 @@ for state in state_list:
 
 fig = plt.figure(num="Corona Map", figsize=(12.8, 6.5))
 corona_maps_list = []
-colors_list=['yellow','gold','darkorange','orangered', 'crimson','firebrick','darkred']
+#colors_list=['yellow','gold','darkorange','orangered', 'crimson','firebrick','darkred']
+colormap = cm.get_cmap('hot_r',8)
+colors_list = colormap(np.linspace(0,1,8))
 bounds = (0,0.33,0.67,1,1.33,1.67,2)
-cmap = colors.ListedColormap(colors_list[0:6])
+cmap = colors.ListedColormap(colors_list[1:7])
 norm = colors.BoundaryNorm(bounds, cmap.N)
-cmap.set_over(colors_list[6])
+cmap.set_over(colors_list[7])
 
 date_list_test = ('4/10/20','4/11/20','4/12/20','4/13/20','4/14/20','4/15/20')
 #def corona_map_single_plot(date_map):
@@ -399,19 +401,19 @@ for date_map in date_list_adjusted:
             marker_size_log = math.log(confirmed_cases_value,10)
             marker_size = marker_size_log*1.75
             if relative_new_cases > 0:
-                marker_color = colors_list[0]
+                marker_color = colors_list[1]
                 if relative_new_cases > 0.33:
-                    marker_color = colors_list[1]
+                    marker_color = colors_list[2]
                     if relative_new_cases > 0.67:
-                        marker_color = colors_list[2]
+                        marker_color = colors_list[3]
                         if relative_new_cases > 1:
-                            marker_color = colors_list[3]
+                            marker_color = colors_list[4]
                             if relative_new_cases > 1.33:
-                                marker_color = colors_list[4]
+                                marker_color = colors_list[5]
                                 if relative_new_cases > 1.67:
-                                    marker_color = colors_list[5]
+                                    marker_color = colors_list[6]
                                     if relative_new_cases > 2:
-                                        marker_color = colors_list[6]
+                                        marker_color = colors_list[7]
 
             if new_cases == 0:
                 marker_color = 'limegreen'
