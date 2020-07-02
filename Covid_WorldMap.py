@@ -1,6 +1,3 @@
-# NewProject
-
-# Information
 # Import Packages
 import matplotlib
 #matplotlib.use("Agg")
@@ -22,15 +19,12 @@ import osgeo
 import cartopy.crs as ccrs
 from datetime import date
 import urllib.request
-
 from matplotlib.lines import Line2D
 from matplotlib.widgets import Slider, Button, RadioButtons
 import cartopy.feature as cfeature
-
 #import ffmpeg
 import imageio
 pd.set_option("display.max_rows", None, "display.max_columns", None)
-#Find a solution for 11/12th of April for moving average
 
 #Writer = animation.writers['ffmpeg']
 #writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
@@ -53,11 +47,8 @@ def datetoheader(gregorian_date):
     header_date = month_header + '/' + day_header + '/' + year_header
     return header_date
 
-
-# Get Data locally (2nd of April 2020)
-#inputdata = "/Users/evaammann/Dropbox/Eva Ammann - Universität/universität bern/Master/Geographie/FS 2020/Seminar Geodatenanalyse/PyCharmProjects/COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
-print("Get Worldwide data")
 # Get Data from John Hopkins GitHub Repository --> RAW very important
+print("Get Worldwide data")
 inputdata = urllib.request.urlopen(
     "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
 print("Got Worldwide data")
@@ -71,18 +62,18 @@ print("Worldwide data was put into dataframe")
 # Create a list of all dates
 # Create a header list
 header_list = df_world.columns.tolist()
-#print("This is the header_list")
-#print(header_list)
+#print("This is the header_list: ", header_list)
 date_list = header_list[4:]
-#print("This is the date_list")
-#print(date_list)
+#print("This is the date_list: ", date_list)
 index_12thofApril = date_list.index("4/12/20")
 index_13thofApril = date_list.index("4/13/20")
 index_14thofApril = date_list.index("4/14/20")
-transition_period_list = [index_12thofApril,index_13thofApril]
+transition_period_list = [index_12thofApril,index_13thofApril,index_14thofApril]
 transition_period_list_dates = ['4/12/20','4/13/20','4/14/20']
-print("Get US data from 12th of April")
+
+
 #Get Data from 12th of April and append Dataframe World
+print("Get US data from 12th of April")
 us12april = urllib.request.urlopen(
     "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports_us/04-12-2020.csv")
 print("Now append all US States to the World dataframe and remove double cruise ships")
@@ -174,7 +165,7 @@ print("All data on board, let's continue")
 # Have a country list
 country_list_original = df_world['Country'].tolist()
 country_list_unique_all = np.unique(country_list_original)
-# remove countries that have numbers broken down to provinces -> Automation?
+# remove countries that have numbers broken down to provinces
 index_Canada = np.argwhere(country_list_unique_all == 'Canada')
 index_Australia = np.argwhere(country_list_unique_all == 'Australia')
 index_China = np.argwhere(country_list_unique_all == 'China')
@@ -197,22 +188,6 @@ country_and_province = np.unique(country_and_province_appended)
 # Count the number of rows
 total_rows = len(df_world.index)
 total_rows_list = range(0, total_rows)
-#print(total_rows)
-
-#print("All days All countries and regions")
-
-# Loop over all columns (days)
-#for day in date_list:
-    #print("This is the day " + day)
-    # Loop over all rows (Countries and Provinces)
-    #for row in total_rows_list:
-        #province = df_world.at[row, 'Province']
-        #if pd.isna(province):
-            #location = df_world.at[row, 'Country']
-        #else:
-            #location = df_world.at[row, 'Province']
-        #confirmed_cases = df_world.at[row, day]
-        #print(location, confirmed_cases)
 
 # Adjust date-list: remove first and last day to enable three day moving average
 date_list_adjusted = date_list[1:-1]
@@ -280,8 +255,8 @@ for state in state_list:
     df_world_threedayaverage.at[state, '4/11/20'] = 0
 #print(df_world_threedayaverage)
 print("Three day moving average dataframe is created")
-print("Make a dataframe to see newly infedcted each day (depending on three day average)")
-#Make a new dataframe to see newly infected (depending on three day average)
+print("Make a dataframe to see newly infected each day (depending on three day average)")
+
 df_world_new_cases = pd.DataFrame(index=country_and_province, columns=date_list_adjusted)
 #print(df_world_new_cases)
 
@@ -299,21 +274,21 @@ for day in date_list_adjusted[1:]:
 
 #print(df_world_new_cases)
 print("Newly infected dataframe was created")
+
 print("Make dataframe to calculate relative new cases")
-# Make new dataframe to calculate relative new infected cases
 df_world_change_cases = pd.DataFrame(index=country_and_province, columns=date_list_adjusted)
 value_for_change_from_zero_to_something = 999
-#Special case for relative values for 23.01.2020
+#Special case for relative values for 23.01.2020 and 24.01.2020 because there are no two days before to compare
 for location in country_and_province:
     if df_world_threedayaverage.at[location, '1/23/20'] > 0:
         df_world_change_cases.at[location, '1/23/20'] = value_for_change_from_zero_to_something
-        df_world_change_cases.at[location,'1/24/20']=df_world_new_cases.at[location,'1/24/20']/df_world_new_cases.at[location,'1/23/20']
+        df_world_change_cases.at[location,'1/24/20'] = df_world_new_cases.at[location,'1/24/20']/df_world_new_cases.at[location,'1/23/20']
     else:
         df_world_change_cases.at[location, '1/23/20'] = 0
-        if df_world_threedayaverage.at[location,'1/24/20']>0:
-            df_world_change_cases.at[location,'1/24/20']=value_for_change_from_zero_to_something
+        if df_world_threedayaverage.at[location,'1/24/20'] > 0:
+            df_world_change_cases.at[location,'1/24/20'] = value_for_change_from_zero_to_something
         else:
-            df_world_change_cases.at[location,'1/24/20']=0
+            df_world_change_cases.at[location,'1/24/20'] = 0
 for day in date_list_adjusted[2:]:
     #print(day)
     column_number_day = date_list_adjusted.index(day)
@@ -332,10 +307,9 @@ for day in date_list_adjusted[2:]:
               #"new cases day before yesterday: ", new_cases_daybeforeyesterday, "new cases ratio: ", new_cases_ratio)
         df_world_change_cases.at[location, day] = new_cases_ratio
 
-#average_state_case_13th_of_April = df_world_threedayaverage.at['US','4/13/20']/50
-#Value for yesterday (12th of April, average per state)
+
 new_cases_per_average_state_13th_of_April = df_world_new_cases.at['US','4/13/20']/50
-print("per state average = ", new_cases_per_average_state_13th_of_April)
+#print("per state average = ", new_cases_per_average_state_13th_of_April)
 
 for state in state_list:
     new_cases_state_14th_of_April = df_world_new_cases.at[state,'4/14/20']
@@ -358,24 +332,18 @@ for state in state_list:
 
 fig = plt.figure(num="Corona Map", figsize=(12.8, 6.5))
 corona_maps_list = []
-#colors_list=['yellow','gold','darkorange','orangered', 'crimson','firebrick','darkred']
-colormap = cm.get_cmap('hot_r',8)
-colors_list = colormap(np.linspace(0,1,8))
+colormap = cm.get_cmap('hot_r',9)
+colors_list = colormap(np.linspace(0,1,9))
 bounds = (0,0.33,0.67,1,1.33,1.67,2)
 cmap = colors.ListedColormap(colors_list[1:7])
 norm = colors.BoundaryNorm(bounds, cmap.N)
 cmap.set_over(colors_list[7])
 
 date_list_test = ('4/10/20','4/11/20','4/12/20','4/13/20','4/14/20','4/15/20')
-#def corona_map_single_plot(date_map):
+
 for date_map in date_list_adjusted:
     date_map_index = date_list_adjusted.index(date_map)
     date_tomorrow_index = date_map_index + 1
-    lat = df_world_threedayaverage['Lat']
-    lon = df_world_threedayaverage['Lon']
-    threedayaverage_map = df_world_threedayaverage[date_map]
-    newly_infected_map = df_world_new_cases[date_map]
-    new_infection_rate_map = df_world_change_cases[date_map]
 
     fig = plt.figure(num="Corona Map", figsize=(12.8, 6.5))
 
@@ -433,8 +401,7 @@ for date_map in date_list_adjusted:
             plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
                      color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
 
-    #colourbar = mcb.ColorbarBase(ax=ax, cmap=cmap, boundaries=bounds)
-    #colourbar.set_label('Infection Rate')
+
     fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, extend = 'max', extendfrac='auto', shrink=0.7, aspect=12, pad=0.05,
                  label='Infection Rate compared to two days ago')
     line1 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="limegreen",markersize= (math.log(100000,10))*1.75)
@@ -470,9 +437,12 @@ for date_map in date_list_adjusted:
 
     #plt.show()
 
-    plt.show(block=False)
-    plt.pause(0.5)
-    plt.close()
+    if date_map == date_list_adjusted[-1]:
+        plt.show()
+    else:
+        plt.show(block=False)
+        plt.pause(0.5)
+        plt.close()
 
 
 #print(corona_maps_list)
@@ -484,7 +454,6 @@ for date_map in date_list_adjusted:
 #plt.show()
 
 
-#plt.show()
 #anim.save('Corona Map Video.mp4', writer=writer)
 
 
