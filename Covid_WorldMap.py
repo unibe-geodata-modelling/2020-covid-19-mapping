@@ -158,7 +158,7 @@ for date in date_list[index_12thofApril:]:
     # Set United States in df_world to zero
     column_number_date = df_world_columns_list.index(date)
     if date in transition_period_list_dates:
-        print("Transition phase, let's keep all the data yay")
+        print("Transition phase US country to states level: Keeping all the data")
     else:
         united_states_index = df_world_country_list.index('US')
         # print(united_states_index)
@@ -435,7 +435,7 @@ for date_map in date_list_adjusted:
 
     plt.tight_layout(pad=1.08)
     # plt.savefig("/Users/evaammann/Desktop/Corona_Maps/CoronaMap_{}".format(date_map_index),dpi=300)
-    # plt.savefig("CoronaMap_{}".format(date_map_index), dpi=100)
+    # plt.savefig("CoronaMap_{}".format(date_map_index), dpi=600)
     # print("Image Saved for {}".format(date_map))
     # corona_map_png = mpimg.imread("CoronaMap_{}.png".format(date_map_index))
     # corona_map_imshow = plt.imshow(corona_map_png)
