@@ -346,7 +346,7 @@ cmap = colors.ListedColormap(colors_list[1:7])
 norm = colors.BoundaryNorm(bounds, cmap.N)
 cmap.set_over(colors_list[7])
 
-date_list_test = ('4/10/20', '4/11/20', '4/12/20', '4/13/20', '4/14/20', '4/15/20')
+date_list_test = ('6/29/20', '6/30/20', '7/1/20', '7/2/20')
 
 for date_map in date_list_adjusted:
     date_map_index = date_list_adjusted.index(date_map)
@@ -434,7 +434,7 @@ for date_map in date_list_adjusted:
                frameon=False)
 
     plt.tight_layout(pad=1.08)
-    # plt.savefig("/Users/evaammann/Desktop/Corona_Maps/CoronaMap_{}".format(date_map_index),dpi=300)
+
     # plt.savefig("CoronaMap_{}".format(date_map_index), dpi=600)
     # print("Image Saved for {}".format(date_map))
     # corona_map_png = mpimg.imread("CoronaMap_{}.png".format(date_map_index))
