@@ -7,6 +7,7 @@ import matplotlib.image as mpimg
 import matplotlib.colors as colors
 import matplotlib.colorbar as mcb
 import matplotlib.animation as animation
+import glob
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import numpy as np
 import numpy.ma as ma
@@ -24,12 +25,11 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 import cartopy.feature as cfeature
 # import ffmpeg
 import imageio
-
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 
-
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+#### Define directory where to save the animation #####
+images_dir = '/Users/evaammann/Desktop/Corona_Maps/'
+###############
 
 def datetoheader(gregorian_date):
     gregorian_date_string = str(gregorian_date)
@@ -71,8 +71,10 @@ date_list = header_list[4:]
 index_12thofApril = date_list.index("4/12/20")
 index_13thofApril = date_list.index("4/13/20")
 index_14thofApril = date_list.index("4/14/20")
+index_15thofApril = date_list.index("4/15/20")
 transition_period_list = [index_12thofApril, index_13thofApril, index_14thofApril]
-transition_period_list_dates = ['4/12/20', '4/13/20', '4/14/20']
+transition_period_list_dates = ['4/12/20', '4/13/20', '4/14/20','4/15/20','4/16/20','4/17/20','4/18/20','4/19/20',
+                                '4/20/20','4/21/20','4/22/20','4/23/20','4/24/20','4/25/20']
 
 # Get Data from 12th of April and append Dataframe World
 print("Get US data from 12th of April")
@@ -153,8 +155,8 @@ for date in date_list[index_12thofApril:]:
     if 'Grand Princess' in df_us_daily.index:
         df_us_daily = df_us_daily.drop(index=['Grand Princess'])
     # print(df_us_daily)
-    # I have state-wide data from the 12th of April -> I can have a threeday-average from the 13th of April. --> And "new data with a ratio value from the 14th of April"
-    # I need threeday-average of US until 13th of April -> I need raw data from US until 14th of April.
+    # I have state-wide data from the 12th of April -> I can have a seven-day-average from the 15th of April. --> I have "newly reported cases" from the 16th of April. I have a comparison to a week ago from the 23rd of April.
+    # I need seven-day-average of US until 22th of April -> I need raw data from US until 25th of April.
     # Set United States in df_world to zero
     column_number_date = df_world_columns_list.index(date)
     if date in transition_period_list_dates:
@@ -196,15 +198,15 @@ total_rows = len(df_world.index)
 total_rows_list = range(0, total_rows)
 
 # Adjust date-list: remove first and last day to enable three day moving average
-date_list_adjusted = date_list[1:-1]
-# print(date_list_adjusted)
+date_list_adjusted = date_list[3:-3]
+print(date_list_adjusted)
 
 # Make new Dataframe with three day moving averages
-print("Create new Dataframe for three day moving averages")
-header_list_threedayaverage = ["Lat", "Lon"] + date_list_adjusted
-# print(header_list_threedayaverage)
-df_world_threedayaverage = pd.DataFrame(index=country_and_province, columns=header_list_threedayaverage)
-# print(df_world_threedayaverage)
+print("Create new Dataframe for seven day moving averages")
+header_list_sevendayaverage = ["Lat", "Lon"] + date_list_adjusted
+# print(header_list_sevendayaverage)
+df_world_sevendayaverage = pd.DataFrame(index=country_and_province, columns=header_list_sevendayaverage)
+# print(df_world_sevendayaverage)
 
 # fill lat and lon
 for row in total_rows_list:
@@ -216,10 +218,10 @@ for row in total_rows_list:
     else:
         location = df_world.at[row, 'Province']
     # print(location, lat, lon)
-    df_world_threedayaverage.at[location, 'Lat'] = lat
-    df_world_threedayaverage.at[location, 'Lon'] = lon
+    df_world_sevendayaverage.at[location, 'Lat'] = lat
+    df_world_sevendayaverage.at[location, 'Lon'] = lon
 
-# print(df_world_threedayaverage)
+# print(df_world_sevendayaverage)
 
 for day in date_list_adjusted:
     date_fractions = day.split('/')
@@ -227,10 +229,14 @@ for day in date_list_adjusted:
     day_of_month = date_fractions[1]
     year = "20" + date_fractions[2]
     # print("day = " + day, "year = " + year, "month = " + month, "day_of_the_month = " + day_of_month)
-    day1 = datetime.date(int(year), int(month), int(day_of_month))
-    day0 = day1 - datetime.timedelta(days=1)
-    day2 = day1 + datetime.timedelta(days=1)
-    # print(day0)
+    day0 = datetime.date(int(year), int(month), int(day_of_month))
+    day_minus1 = day0 - datetime.timedelta(days=1)
+    day_minus2 = day0 - datetime.timedelta(days=2)
+    day_minus3 = day0 - datetime.timedelta(days=3)
+    day_plus1 = day0 + datetime.timedelta(days=1)
+    day_plus2 = day0 + datetime.timedelta(days=2)
+    day_plus3 = day0 + datetime.timedelta(days=3)
+    print(day0)
     # print(day1)
     # print(day2)
     # print("This is the day " + day)
@@ -241,27 +247,46 @@ for day in date_list_adjusted:
             location = df_world.at[row, 'Country']
         else:
             location = df_world.at[row, 'Province']
+        day_minus1_header = datetoheader(day_minus1)
+        day_minus2_header = datetoheader(day_minus2)
+        day_minus3_header = datetoheader(day_minus3)
         day0_header = datetoheader(day0)
-        day1_header = datetoheader(day1)
-        day2_header = datetoheader(day2)
+        day_plus1_header = datetoheader(day_plus1)
+        day_plus2_header = datetoheader(day_plus2)
+        day_plus3_header = datetoheader(day_plus3)
         confirmed_cases_day0 = df_world.at[row, day0_header]
-        confirmed_cases_day1 = df_world.at[row, day1_header]
-        confirmed_cases_day2 = df_world.at[row, day2_header]
+        confirmed_cases_day_minus1 = df_world.at[row, day_minus1_header]
+        confirmed_cases_day_minus2 = df_world.at[row, day_minus2_header]
+        confirmed_cases_day_minus3 = df_world.at[row, day_minus3_header]
+        confirmed_cases_day_plus1 = df_world.at[row, day_plus1_header]
+        confirmed_cases_day_plus2 = df_world.at[row, day_plus2_header]
+        confirmed_cases_day_plus3 = df_world.at[row, day_plus3_header]
 
-        confirmed_cases_days_0_1_2 = [confirmed_cases_day0, confirmed_cases_day1, confirmed_cases_day2]
+        confirmed_cases_days_minus123_0_plus123 = [confirmed_cases_day0, confirmed_cases_day_minus1,
+                                                   confirmed_cases_day_minus2, confirmed_cases_day_minus3,
+                                                   confirmed_cases_day_plus1, confirmed_cases_day_plus2,
+                                                   confirmed_cases_day_plus3]
         # print(location, confirmed_cases_days_0_1_2)
 
-        confirmed_cases_three_day_average = statistics.mean(confirmed_cases_days_0_1_2)
-        df_world_threedayaverage.at[location, day1_header] = confirmed_cases_three_day_average
+        confirmed_cases_seven_day_average = statistics.mean(confirmed_cases_days_minus123_0_plus123)
+        df_world_sevendayaverage.at[location, day0_header] = confirmed_cases_seven_day_average
 
-df_world_threedayaverage.at['US', '4/14/20'] = 0
-df_world_threedayaverage.at['US', '4/15/20'] = 0
+df_world_sevendayaverage.at['US', '4/23/20'] = 0
+df_world_sevendayaverage.at['US', '4/24/20'] = 0
+df_world_sevendayaverage.at['US', '4/25/20'] = 0
+df_world_sevendayaverage.at['US', '4/26/20'] = 0
+df_world_sevendayaverage.at['US', '4/27/20'] = 0
+df_world_sevendayaverage.at['US', '4/28/20'] = 0
 for state in state_list:
-    df_world_threedayaverage.at[state, '4/12/20'] = 0
-    df_world_threedayaverage.at[state, '4/11/20'] = 0
+    df_world_sevendayaverage.at[state, '4/9/20'] = 0
+    df_world_sevendayaverage.at[state, '4/10/20'] = 0
+    df_world_sevendayaverage.at[state, '4/11/20'] = 0
+    df_world_sevendayaverage.at[state, '4/12/20'] = 0
+    df_world_sevendayaverage.at[state, '4/13/20'] = 0
+    df_world_sevendayaverage.at[state, '4/14/20'] = 0
 # print(df_world_threedayaverage)
-print("Three day moving average dataframe is created")
-print("Make a dataframe to see newly infected each day (depending on three day average)")
+print("Seven day moving average dataframe is created")
+print("Make a dataframe to see newly infected each day (depending on seven day average)")
 
 df_world_new_cases = pd.DataFrame(index=country_and_province, columns=date_list_adjusted)
 # print(df_world_new_cases)
@@ -269,14 +294,14 @@ df_world_new_cases = pd.DataFrame(index=country_and_province, columns=date_list_
 # Fill df_world_new_cases
 # For the first day
 for location in country_and_province:
-    df_world_new_cases.at[location, '1/23/20'] = df_world_threedayaverage.at[location, '1/23/20']
+    df_world_new_cases.at[location, '1/25/20'] = df_world_sevendayaverage.at[location, '1/25/20']
 # Loop for all following days
 for day in date_list_adjusted[1:]:
-    # print(day)
+    print(day)
     column_number_day = date_list_adjusted.index(day)
     day_yesterday = date_list_adjusted[column_number_day - 1]
     for location in country_and_province:
-        df_world_new_cases.at[location, day] = df_world_threedayaverage.at[location, day] - df_world_threedayaverage.at[
+        df_world_new_cases.at[location, day] = df_world_sevendayaverage.at[location, day] - df_world_sevendayaverage.at[
             location, day_yesterday]
 
 # print(df_world_new_cases)
@@ -285,57 +310,74 @@ print("Newly infected dataframe was created")
 print("Make dataframe to calculate relative new cases")
 df_world_change_cases = pd.DataFrame(index=country_and_province, columns=date_list_adjusted)
 value_for_change_from_zero_to_something = 999
-# Special case for relative values for 23.01.2020 and 24.01.2020 because there are no two days before to compare
-for location in country_and_province:
-    if df_world_threedayaverage.at[location, '1/23/20'] > 0:
-        df_world_change_cases.at[location, '1/23/20'] = value_for_change_from_zero_to_something
-        df_world_change_cases.at[location, '1/24/20'] = df_world_new_cases.at[location, '1/24/20'] / \
-                                                        df_world_new_cases.at[location, '1/23/20']
-    else:
-        df_world_change_cases.at[location, '1/23/20'] = 0
-        if df_world_threedayaverage.at[location, '1/24/20'] > 0:
-            df_world_change_cases.at[location, '1/24/20'] = value_for_change_from_zero_to_something
-        else:
-            df_world_change_cases.at[location, '1/24/20'] = 0
-for day in date_list_adjusted[2:]:
-    # print(day)
+# Special case for relative values for 25.01.2020 and 24.01.2020 because there are no two days before to compare
+#for location in country_and_province:
+    #if df_world_sevendayaverage.at[location, '1/25/20'] > 0:
+        #df_world_change_cases.at[location, '1/25/20'] = value_for_change_from_zero_to_something
+        #df_world_change_cases.at[location, '1/26/20'] = df_world_new_cases.at[location, '1/26/20'] / \
+                                                        #df_world_new_cases.at[location, '1/25/20']
+
+    #else:
+        #df_world_change_cases.at[location, '1/23/20'] = 0
+        #if df_world_sevendayaverage.at[location, '1/24/20'] > 0:
+            #df_world_change_cases.at[location, '1/24/20'] = value_for_change_from_zero_to_something
+        #else:
+            #df_world_change_cases.at[location, '1/24/20'] = 0
+for day in date_list_adjusted[7:]:
+    print(day)
     column_number_day = date_list_adjusted.index(day)
     day_yesterday = date_list_adjusted[column_number_day - 1]
-    day_before_yesterday = date_list_adjusted[column_number_day - 2]
+    day_a_week_ago = date_list_adjusted[column_number_day - 7]
     for location in country_and_province:
         new_cases_today = df_world_new_cases.at[location, day]
-        new_cases_daybeforeyesterday = df_world_new_cases.at[location, day_before_yesterday]
+        new_cases_day_a_week_ago = df_world_new_cases.at[location, day_a_week_ago]
         if new_cases_today == 0:
             new_cases_ratio = 0
-        elif new_cases_daybeforeyesterday == 0:
+        elif new_cases_day_a_week_ago == 0:
             new_cases_ratio = value_for_change_from_zero_to_something
         else:
-            new_cases_ratio = new_cases_today / new_cases_daybeforeyesterday
-        # print("location: ", location, "today: ", day , "day before yesterday: ", day_before_yesterday, "new cases today: ", new_cases_today,
-        # "new cases day before yesterday: ", new_cases_daybeforeyesterday, "new cases ratio: ", new_cases_ratio)
+            new_cases_ratio = new_cases_today / new_cases_day_a_week_ago
+        if day == '2/1/20':
+            print("location: ", location, "today: ", day , "day a week ago: ", day_a_week_ago, "new cases today: ", new_cases_today,
+            "new cases day a week ago: ", new_cases_day_a_week_ago, "new cases ratio: ", new_cases_ratio)
         df_world_change_cases.at[location, day] = new_cases_ratio
 
-new_cases_per_average_state_13th_of_April = df_world_new_cases.at['US', '4/13/20'] / 50
+#new_cases_per_average_state_13th_of_April = df_world_new_cases.at['US', '4/13/20'] / 50
 # print("per state average = ", new_cases_per_average_state_13th_of_April)
 
-for state in state_list:
-    new_cases_state_14th_of_April = df_world_new_cases.at[state, '4/14/20']
-    new_cases_state_15th_of_April = df_world_new_cases.at[state, '4/15/20']
-    new_cases_ratio_14 = new_cases_state_14th_of_April / new_cases_per_average_state_13th_of_April
-    if new_cases_state_14th_of_April == 0:
-        new_cases_ratio_15 = value_for_change_from_zero_to_something
-    else:
-        new_cases_ratio_15 = new_cases_state_15th_of_April / new_cases_state_14th_of_April
-    df_world_change_cases.at[state, '4/14/20'] = new_cases_ratio_14
-    df_world_change_cases.at[state, '4/15/20'] = new_cases_ratio_15
+#for state in state_list:
+    #new_cases_state_14th_of_April = df_world_new_cases.at[state, '4/14/20']
+    #new_cases_state_15th_of_April = df_world_new_cases.at[state, '4/15/20']
+    #new_cases_ratio_14 = new_cases_state_14th_of_April / new_cases_per_average_state_13th_of_April
+    #if new_cases_state_14th_of_April == 0:
+        #new_cases_ratio_15 = value_for_change_from_zero_to_something
+    #else:
+        #new_cases_ratio_15 = new_cases_state_15th_of_April / new_cases_state_14th_of_April
+    #df_world_change_cases.at[state, '4/14/20'] = new_cases_ratio_14
+    #df_world_change_cases.at[state, '4/15/20'] = new_cases_ratio_15
     # print (state, new_cases_per_average_state_13th_of_April, new_cases_state_14th_of_April, new_cases_state_15th_of_April, 'rates: ',
     # new_cases_ratio_14, df_world_change_cases.at[state,'4/15/20'])
 
 # print(df_world_change_cases)
 print("Datframe for new cases ratio was created")
+for location in country_and_province:
+    df_world_sevendayaverage.at[location, '1/25/20'] = 0
+    df_world_sevendayaverage.at[location, '1/26/20'] = 0
+    df_world_sevendayaverage.at[location, '1/27/20'] = 0
+    df_world_sevendayaverage.at[location, '1/28/20'] = 0
+    df_world_sevendayaverage.at[location, '1/29/20'] = 0
+    df_world_sevendayaverage.at[location, '1/30/20'] = 0
+    df_world_sevendayaverage.at[location, '1/31/20'] = 0
 
 for state in state_list:
-    df_world_threedayaverage.at[state, '4/13/20'] = 0
+    df_world_sevendayaverage.at[state, '4/15/20'] = 0
+    df_world_sevendayaverage.at[state, '4/16/20'] = 0
+    df_world_sevendayaverage.at[state, '4/17/20'] = 0
+    df_world_sevendayaverage.at[state, '4/18/20'] = 0
+    df_world_sevendayaverage.at[state, '4/19/20'] = 0
+    df_world_sevendayaverage.at[state, '4/20/20'] = 0
+    df_world_sevendayaverage.at[state, '4/21/20'] = 0
+    df_world_sevendayaverage.at[state, '4/22/20'] = 0
 
 fig = plt.figure(num="Corona Map", figsize=(12.8, 6.5))
 corona_maps_list = []
@@ -367,7 +409,7 @@ for date_map in date_list_adjusted:
                  pad=22)
 
     for location in country_and_province:
-        confirmed_cases_value = df_world_threedayaverage.at[location, date_map]
+        confirmed_cases_value = df_world_sevendayaverage.at[location, date_map]
         new_cases = df_world_new_cases.at[location, date_map]
         relative_new_cases = df_world_change_cases.at[location, date_map]
         if confirmed_cases_value > 1:
@@ -403,12 +445,12 @@ for date_map in date_list_adjusted:
                 # plt.text(df_world_threedayaverage.at[location,'Lon'], df_world_threedayaverage.at[location,'Lat'],
                 # zero_infections_streak, transform = ccrs.PlateCarree())
 
-            plt.plot(df_world_threedayaverage.at[location, 'Lon'], df_world_threedayaverage.at[location, 'Lat'],
+            plt.plot(df_world_sevendayaverage.at[location, 'Lon'], df_world_sevendayaverage.at[location, 'Lat'],
                      color=marker_color, marker='o', markersize=marker_size, transform=ccrs.PlateCarree())
 
     fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, extend='max', extendfrac='auto', shrink=0.7, aspect=12,
                  pad=0.05,
-                 label='Infection Rate compared to two days ago')
+                 label='Infection Rate compared to one week ago')
     line1 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="limegreen",
                    markersize=(math.log(100000, 10)) * 1.75)
     line2 = Line2D(range(1), range(1), linewidth=0, color="white", marker='o', markerfacecolor="green",
@@ -435,8 +477,8 @@ for date_map in date_list_adjusted:
 
     plt.tight_layout(pad=1.08)
 
-    # plt.savefig("CoronaMap_{}".format(date_map_index), dpi=600)
-    # print("Image Saved for {}".format(date_map))
+    plt.savefig(images_dir + "CoronaMap_{}".format(date_map_index), dpi=100)
+    print("Image Saved for {}".format(date_map))
     # corona_map_png = mpimg.imread("CoronaMap_{}.png".format(date_map_index))
     # corona_map_imshow = plt.imshow(corona_map_png)
 
@@ -461,3 +503,37 @@ for date_map in date_list_adjusted:
 
 
 # anim.save('Corona Map Video.mp4', writer=writer)
+
+
+#nb_imgs = 160
+scaling_fig = 1
+
+
+files = glob.glob(images_dir + '*.png')
+#files = files[0:20]
+
+fig = plt.figure(figsize=(12.8 * scaling_fig, 6.5 * scaling_fig))
+imgs = []
+
+for i in range(len(files)):
+
+    file = '{}/CoronaMap_{}.png'.format(images_dir, i)
+
+    fig_data = plt.imread(file)
+    im = plt.imshow(fig_data)
+    #fig.set_size_inches(4, 3)
+    plt.axis('off')
+    plt.tight_layout()
+
+    # Store it in the list
+    imgs.append([im])
+
+    del(fig_data)
+    del(im)
+
+# Create animation
+print("Create and save animation")
+anim = animation.ArtistAnimation(fig, imgs, interval=1000, repeat_delay=1000)
+anim.save(images_dir + 'covid_animation.gif', writer='pillow', fps=4)
+print("Animation saved")
+
