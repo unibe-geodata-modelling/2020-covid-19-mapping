@@ -239,7 +239,7 @@ for day in date_list_adjusted:
     day_plus1 = day0 + datetime.timedelta(days=1)
     day_plus2 = day0 + datetime.timedelta(days=2)
     day_plus3 = day0 + datetime.timedelta(days=3)
-    print(day0)
+    #print(day0)
     # print(day1)
     # print(day2)
     # print("This is the day " + day)
