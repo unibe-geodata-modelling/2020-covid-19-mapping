@@ -43,4 +43,5 @@ Many thanks to Dr. Pascal Horton and Dr. Andreas Zischg for this very interestin
 
 ## References
 Bragato, P.L. (2020): Assessment of the weekly fluctuations of the Covid-19 cases in Italy and worldwide. Preprints. https://www.preprints.org/manuscript/202005.0202/v1 (accessed 02.07.2020)
+
 Lauer, S.A., Grantz, K.H., Bi, Q., Jones, F.K., Zheng, Q., Meredith, H.R., Azman, A.S., Reich, N.G. & Lessler, J. (2020): The Incubation Period of Coronavirus Disease 2019 (COVID-19) From Publicly Reported Confirmed Cases: Estimation and Application. Annals of Internal Medicine: Volume 172, Issue 9, pages 577-582.
