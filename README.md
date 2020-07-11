@@ -30,7 +30,7 @@ Each of the maps is displayed for half a second and saved to a previously define
 
 Each maps looks like this:
 
-![Corona Map](https://github.com/unibe-geodata-modelling/2020-covid-19-mapping/blob/master/CoronaMap_159.png)
+![Corona Map](https://github.com/unibe-geodata-modelling/2020-covid-19-mapping/blob/master/CoronaMap_157.png)
 
 
 By deleting the hashtag in line 438 each map can be saved individually as .png.
