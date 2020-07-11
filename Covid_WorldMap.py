@@ -23,16 +23,17 @@ import urllib.request
 from matplotlib.lines import Line2D
 from matplotlib.widgets import Slider, Button, RadioButtons
 import cartopy.feature as cfeature
-# import ffmpeg
 import imageio
 
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 
-#### Define directory where to save the animation #####
+########### Define directory where to save the animation ##############
+
+
 images_dir = '/Users/evaammann/Desktop/Corona_Maps/'
 
 
-###############
+#######################################################################
 
 def datetoheader(gregorian_date):
     gregorian_date_string = str(gregorian_date)
@@ -202,7 +203,7 @@ total_rows_list = range(0, total_rows)
 
 # Adjust date-list: remove first and last day to enable three day moving average
 date_list_adjusted = date_list[3:-3]
-print(date_list_adjusted)
+#print(date_list_adjusted)
 
 # Make new Dataframe with three day moving averages
 print("Create new Dataframe for seven day moving averages")
@@ -239,7 +240,7 @@ for day in date_list_adjusted:
     day_plus1 = day0 + datetime.timedelta(days=1)
     day_plus2 = day0 + datetime.timedelta(days=2)
     day_plus3 = day0 + datetime.timedelta(days=3)
-    #print(day0)
+    # print(day0)
     # print(day1)
     # print(day2)
     # print("This is the day " + day)
@@ -300,7 +301,7 @@ for location in country_and_province:
     df_world_new_cases.at[location, '1/25/20'] = df_world_sevendayaverage.at[location, '1/25/20']
 # Loop for all following days
 for day in date_list_adjusted[1:]:
-    print(day)
+    #print(day)
     column_number_day = date_list_adjusted.index(day)
     day_yesterday = date_list_adjusted[column_number_day - 1]
     for location in country_and_province:
@@ -316,7 +317,7 @@ value_for_change_from_zero_to_something = 999
 # Special case for relative values for 25.01.2020 to 30.01. because there is no week before to compare
 
 for day in date_list_adjusted[7:]:
-    print(day)
+    #print(day)
     column_number_day = date_list_adjusted.index(day)
     day_yesterday = date_list_adjusted[column_number_day - 1]
     day_a_week_ago = date_list_adjusted[column_number_day - 7]
@@ -329,27 +330,9 @@ for day in date_list_adjusted[7:]:
             new_cases_ratio = value_for_change_from_zero_to_something
         else:
             new_cases_ratio = new_cases_today / new_cases_day_a_week_ago
-        if day == '2/1/20':
-            print("location: ", location, "today: ", day, "day a week ago: ", day_a_week_ago, "new cases today: ",
-                  new_cases_today,
-                  "new cases day a week ago: ", new_cases_day_a_week_ago, "new cases ratio: ", new_cases_ratio)
+
         df_world_change_cases.at[location, day] = new_cases_ratio
 
-# new_cases_per_average_state_13th_of_April = df_world_new_cases.at['US', '4/13/20'] / 50
-# print("per state average = ", new_cases_per_average_state_13th_of_April)
-
-# for state in state_list:
-# new_cases_state_14th_of_April = df_world_new_cases.at[state, '4/14/20']
-# new_cases_state_15th_of_April = df_world_new_cases.at[state, '4/15/20']
-# new_cases_ratio_14 = new_cases_state_14th_of_April / new_cases_per_average_state_13th_of_April
-# if new_cases_state_14th_of_April == 0:
-# new_cases_ratio_15 = value_for_change_from_zero_to_something
-# else:
-# new_cases_ratio_15 = new_cases_state_15th_of_April / new_cases_state_14th_of_April
-# df_world_change_cases.at[state, '4/14/20'] = new_cases_ratio_14
-# df_world_change_cases.at[state, '4/15/20'] = new_cases_ratio_15
-# print (state, new_cases_per_average_state_13th_of_April, new_cases_state_14th_of_April, new_cases_state_15th_of_April, 'rates: ',
-# new_cases_ratio_14, df_world_change_cases.at[state,'4/15/20'])
 
 # print(df_world_change_cases)
 print("Datframe for new cases ratio was created")
@@ -362,7 +345,6 @@ for location in country_and_province:
     df_world_sevendayaverage.at[location, '1/30/20'] = 0
     df_world_sevendayaverage.at[location, '1/31/20'] = 0
 
-
 for state in state_list:
     df_world_sevendayaverage.at[state, '4/15/20'] = 0
     df_world_sevendayaverage.at[state, '4/16/20'] = 0
@@ -374,7 +356,6 @@ for state in state_list:
     df_world_sevendayaverage.at[state, '4/22/20'] = 0
 
 fig = plt.figure(num="Corona Map", figsize=(12.8, 6.5))
-corona_maps_list = []
 colormap = cm.get_cmap('hot_r', 9)
 colors_list = colormap(np.linspace(0, 1, 9))
 bounds = (0, 0.33, 0.67, 1, 1.33, 1.67, 2)
@@ -473,10 +454,7 @@ for date_map in date_list_adjusted[7:]:
 
     plt.savefig(images_dir + "CoronaMap_{}".format(date_map_index), dpi=100)
     print("Image Saved for {}".format(date_map))
-    # corona_map_png = mpimg.imread("CoronaMap_{}.png".format(date_map_index))
-    # corona_map_imshow = plt.imshow(corona_map_png)
 
-    # corona_maps_list.append(corona_map_imshow,)
 
     # plt.show()
 
@@ -487,19 +465,8 @@ for date_map in date_list_adjusted[7:]:
         plt.pause(0.5)
         plt.close()
 
-# print(corona_maps_list)
-# print("Start the Animation")
-# FFWriter = animation.FFMpegWriter(fps=20)
-# fig_anim = plt.figure(num="Corona Map", figsize=(12.8, 6.5))
-# anim = animation.ArtistAnimation(fig=fig, artists=corona_maps_list,interval=50, repeat_delay=3000,
-# blit=True)
-# plt.show()
 
 
-# anim.save('Corona Map Video.mp4', writer=writer)
-
-
-# nb_imgs = 160
 scaling_fig = 1
 
 files = glob.glob(images_dir + '*.png')
