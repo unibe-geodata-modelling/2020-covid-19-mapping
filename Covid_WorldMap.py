@@ -452,7 +452,7 @@ for date_map in date_list_adjusted[7:]:
 
     plt.tight_layout(pad=1.08)
 
-    plt.savefig(images_dir + "CoronaMap_{}".format(date_map_index), dpi=100)
+    plt.savefig(images_dir + "CoronaMap_{}".format(date_map_index-7), dpi=200)
     print("Image Saved for {}".format(date_map))
 
 
