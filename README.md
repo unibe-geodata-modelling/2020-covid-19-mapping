@@ -10,7 +10,7 @@ Name: Eva Ammann
 E-Mail: Eva.ammann@students.unibe.ch
 
 ## About the Code
-This code visualizes the global spread of lab-confirmed Covid-19 cases across the world from February 1st on and exports the visualization as a .gif animation to a specified directory. It shows the confirmed cases per country, except for China, Australia and Canada where the data is broken down to Provinces. For the United States, the data is available on state-level from the 12th of April on. 
+This code visualizes the global spread of lab-confirmed Covid-19 cases across the world from February 1st 2020 on and exports the visualization as a .gif animation to a specified directory. It shows the confirmed cases per country, except for China, Australia and Canada where the data is broken down to Provinces. For the United States, the data is available on state-level from the 12th of April on. 
 The data is retrieved from the John Hopkins University’s (JHU) GitHub repository (https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data). During the Covid-19 pandemic, the Center for Systems Science and Engineering at the John Hopkins University in Baltimore, United States has emerged as trustworthy source for global data on the corona virus. It frequently and semi-automatically updates numbers of confirmed cases, deaths, recovered patients and where available tests conducted for all countries in the world. 
 
 In this code, only the numbers on confirmed infections are used. The main datafile used from the JHU’s repository is the global time series on confirmed infections. In this file there is all the data needed for the countries, the overseas territories, the cruise ships and the provinces of Canada, China and Australia. From the 12th of April on, the program code calls the daily reports of US states. The data on the confirmed cases is taken from each of them and appended to the global dataframe.
@@ -30,10 +30,8 @@ Each of the maps is displayed for half a second and saved to a previously define
 
 Each maps looks like this:
 
-![Corona Map](https://github.com/unibe-geodata-modelling/2020-covid-19-mapping/blob/master/CoronaMap_159.png)
+![Corona Map](https://github.com/unibe-geodata-modelling/2020-covid-19-mapping/blob/master/CoronaMap_157.png)
 
-
-By deleting the hashtag in line 438 each map can be saved individually as .png.
 
 ## Possible improvements of the code
 - Code could be made leaner by combining all information into one dataframe with several dimensions
@@ -45,4 +43,5 @@ Many thanks to Dr. Pascal Horton and Dr. Andreas Zischg for this very interestin
 
 ## References
 Bragato, P.L. (2020): Assessment of the weekly fluctuations of the Covid-19 cases in Italy and worldwide. Preprints. https://www.preprints.org/manuscript/202005.0202/v1 (accessed 02.07.2020)
+
 Lauer, S.A., Grantz, K.H., Bi, Q., Jones, F.K., Zheng, Q., Meredith, H.R., Azman, A.S., Reich, N.G. & Lessler, J. (2020): The Incubation Period of Coronavirus Disease 2019 (COVID-19) From Publicly Reported Confirmed Cases: Estimation and Application. Annals of Internal Medicine: Volume 172, Issue 9, pages 577-582.
