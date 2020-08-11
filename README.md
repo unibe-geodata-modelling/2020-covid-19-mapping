@@ -28,9 +28,9 @@ After the creation of all dataframes, the program loops through all available da
 
 Each of the maps is displayed for half a second and saved to a previously defined directory. The map of the last available day remains visible and has to be closed with the cursor. After the last image is closed, all maps are compiled into a gif-animation and this is also saved in the previously defined directory. 
 
-Each maps looks like this:
+This is the .gif animation of the 11th of August 2020:
 
-![Corona Map](https://github.com/unibe-geodata-modelling/2020-covid-19-mapping/blob/master/CoronaMap_157.png)
+![Corona Map](https://github.com/unibe-geodata-modelling/2020-covid-19-mapping/blob/master/covid_animation.gif)
 
 
 ## Possible improvements of the code
